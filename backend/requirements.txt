@@ -1,0 +1,12 @@
+# Core Framework
+fastapi[standard]
+pydantic-settings
+
+# Database & ORM
+SQLAlchemy
+alembic
+psycopg2-binary
+
+# Spatial / GIS
+GeoAlchemy2
+shapely
