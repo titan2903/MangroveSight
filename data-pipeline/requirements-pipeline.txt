@@ -1,0 +1,16 @@
+# Requirements tambahan untuk data-pipeline
+# Install dengan: pip install -r requirements-pipeline.txt
+
+# Geospatial Processing
+geopandas
+fiona
+pyproj
+shapely
+
+# Database
+sqlalchemy
+geoalchemy2
+psycopg2-binary
+
+# Environment Variables
+python-dotenv
