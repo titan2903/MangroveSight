@@ -101,7 +101,13 @@ graph TD
 - **Backend Pipeline (`heroku-deploy.yml`)**: Triggered on push to `master`. Deploys the FastAPI code to Heroku.
 - **Secrets Management**: GitHub Secrets hold the deploy tokens (`NETLIFY_AUTH_TOKEN`, `HEROKU_API_KEY`). Application secrets (like `GEMINI_API_KEY` and `DATABASE_URL`) are stored in Heroku's Config Vars, never in the frontend or source code.
 
-## 4. AI Architecture (Precomputed Context Pattern)
+## 4. Local Development (Docker)
+
+To ensure a seamless local development experience without installing complex native geospatial libraries, the project utilizes **Docker** and **Docker Compose**:
+- **PostGIS Container**: `postgis/postgis` image is used to spin up a local PostgreSQL database with PostGIS extensions pre-installed.
+- **Backend/Frontend**: Can be run locally via standard Python/npm commands, connecting to the Dockerized PostGIS instance, or optionally fully containerized if preferred.
+
+## 5. AI Architecture (Precomputed Context Pattern)
 
 To ensure fast response times, low API costs, and high accuracy (preventing LLM spatial hallucinations), the AI Assistant uses a **Precomputed Context Pattern**:
 

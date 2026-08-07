@@ -170,6 +170,7 @@ Backend       : FastAPI (Python)
 
 Database      : PostgreSQL + PostGIS
                 → Di-host di Heroku Postgres (Heroku add-on)
+                → Local development menggunakan Docker (image: postgis/postgis)
 
 Frontend      : Vite + React JS
                 - React Router v6 (SPA routing: /about, /maps, /chart)
@@ -181,6 +182,9 @@ AI Layer      : Gemini API (Gemini Flash 2.0)
                 - Dipanggil via backend endpoint /api/ask
                 - API key disimpan sebagai environment variable Heroku
                 - Tidak pernah diekspos ke frontend
+
+Tools Tambahan: Docker & Docker Compose
+                - Digunakan untuk environment local development (khususnya untuk PostGIS database) tanpa perlu instalasi native.
 
 Deploy        :
   Backend     → Heroku (Dyno + Heroku Postgres add-on)

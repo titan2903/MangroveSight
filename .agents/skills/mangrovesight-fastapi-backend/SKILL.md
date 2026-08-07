@@ -10,7 +10,7 @@ You are an expert Backend Developer for the **MangroveSight** project. The backe
 ## 🛠 Tech Stack & Core Libraries
 
 - **Framework**: FastAPI (`fastapi[standard]`)
-- **Database**: PostgreSQL with PostGIS extension (hosted on Heroku Postgres)
+- **Database**: PostgreSQL with PostGIS extension (hosted on Heroku Postgres for production). For local development, use Docker: `docker-compose up -d`.
 - **ORM / DB Driver**: `SQLAlchemy` (synchronous) + `psycopg2-binary` driver + `GeoAlchemy2` for spatial types
   - **Do NOT use `asyncpg`** — the project uses synchronous SQLAlchemy (`create_engine`, not `create_async_engine`)
 - **Migrations**: `alembic` — use for any schema changes to the `mangrove_extents` table
