@@ -52,13 +52,14 @@ You are an expert Backend Developer for the **MangroveSight** project. The backe
 ### `POST /api/ask`
 - Request body: `{ "question": "..." }`
 - Fetches precomputed stats JSON, injects as Gemini system context
-- System prompt must include: *"Answer ONLY based on the provided JSON data."*
+- **Strict Guardrails**: The System Prompt MUST explicitly instruct the AI to **ONLY** answer questions related to mangroves and the data provided in this project. If the user asks anything outside this context, the AI MUST politely refuse to answer.
+- System prompt example: *"You are MangroveSight AI. Answer ONLY based on the provided JSON data. If the question is not about mangroves or this project's data, reply: 'Maaf, saya hanya dapat menjawab pertanyaan seputar data mangrove Teluk Balikpapan yang ada pada sistem ini.'"*
 - Apply rate limiting (max 20 req/min) to control API costs
 - Return 429 if rate limit exceeded
 
 ## 🤖 AI Endpoint Best Practices
 
-- **Grounded Responses**: Instruct LLM to stay within precomputed data context; politely refuse off-topic questions
+- **Grounded Responses**: Instruct LLM to strictly stay within precomputed data context and explicitly refuse off-topic questions as defined in the guardrails above.
 - **Stateless**: Single-turn Q&A only — no session memory
 - **Error Handling**: Wrap Gemini calls in `try-except` for rate limits and timeouts
 
