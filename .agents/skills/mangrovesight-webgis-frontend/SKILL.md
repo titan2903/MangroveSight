@@ -8,50 +8,143 @@ description: Frontend development guidelines for MangroveSight WebGIS project us
 You are an expert Frontend Developer for the **MangroveSight** project, a WebGIS application that monitors mangrove forest changes in Teluk Balikpapan (2000-2020).
 
 ## 🛠 Tech Stack & Core Libraries
-- **Framework**: React JS (bootstrapped with Vite)
-- **Routing**: React Router v6 (`/about`, `/maps`, `/chart`)
-- **WebGIS / Mapping**: `react-leaflet` (Leaflet.js wrapper)
+
+- **Framework**: React 19 (bootstrapped with Vite 8)
+- **Routing**: `react-router-dom` v6 (routes: `/about`, `/maps`, `/chart`)
+- **WebGIS / Mapping**: `react-leaflet` + `leaflet`
 - **Data Visualization**: `recharts`
-- **Geospatial Utils (Optional)**: `turf.js` (for client-side area validation/processing if needed)
-- **Styling**: Vanilla CSS / CSS Modules with modern and clean UI (glassmorphism, subtle animations).
+- **Geospatial Utils (Optional)**: `turf.js` — only for client-side validation/area checks if backend data is insufficient; do NOT use for primary statistics (use `/api/stats` instead)
+- **Styling**: Vanilla CSS / CSS Modules — glassmorphism, subtle animations, "Mangrove Vibe" theme
 
-## 🗺 Map Development (Halaman Maps - `/maps`)
-- **`react-leaflet` Best Practices**: Ensure the `MapContainer` has a defined height/width (otherwise the map won't render).
-- **GeoJSON Rendering**: Use Leaflet's `<GeoJSON />` component to render the mangrove spatial data. Be mindful of React state changes to avoid unnecessary re-renders of heavy GeoJSON layers.
-- **Layer Styling**: Maintain a consistent green color for mangrove layers. Ensure smooth switching between epochs (2000-2020).
-- **Change Detection View**: When comparing two epochs (F3), use contrasting colors (e.g., Red for Loss, Blue for Gain, Green for Unchanged).
-- **Basemaps**: Provide toggle functionality between OpenStreetMap (OSM) and Esri Satellite base maps.
+## 📦 First-Time Project Setup (in order)
 
-## 📊 Data Visualization (Halaman Chart - `/chart`)
-- Use **Recharts** to render statistical data fetched from `/api/stats`.
-- **Line Chart**: To visualize the trend of mangrove area (ha) over time (2000-2020).
-- **Bar Chart**: To display the changes (delta in ha) between epochs. Use green bars for gain and red bars for loss.
-- Ensure charts are fully responsive (`<ResponsiveContainer>`) and adapt to the layout.
+> The frontend currently contains only the Vite boilerplate. Follow this order when building from scratch:
 
-## 🤖 AI Insight Assistant (Chat Widget)
-- Implement a floating chat widget for the AI Assistant.
-- **Mechanism**: The frontend simply sends user text input to the backend (`/api/ask`) and displays the response.
-- **Stateless**: The chat doesn't need complex multi-turn memory across sessions. Keep the UI simple (Message list + Input box + Loading state).
-- Ensure a fast and responsive UI, displaying a loading indicator while waiting for the Gemini API response from the backend.
+```bash
+cd frontend
+
+# 1. Install core dependencies
+npm install react-router-dom react-leaflet leaflet recharts
+
+# 2. (Optional) Install turf for client-side geo utilities
+npm install @turf/turf
+
+# 3. Configure environment variable for API URL
+echo "VITE_API_BASE_URL=http://localhost:8000" > .env
+echo "VITE_API_BASE_URL=" >> .env.example  # placeholder for production
+```
+
+## ⚙️ Vite Config — Local Dev Proxy
+
+Add a proxy to `vite.config.js` so the frontend can call `http://localhost:8000/api/...` without CORS errors during local development:
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_BASE_URL || 'http://localhost:8000',
+        changeOrigin: true,
+      }
+    }
+  }
+})
+```
+
+In production (Netlify), use the `VITE_API_BASE_URL` env variable to point to the Heroku backend URL.
+
+## 🌐 Environment Variables
+
+| Variable | Local | Production (Netlify) |
+|----------|-------|----------------------|
+| `VITE_API_BASE_URL` | `http://localhost:8000` | `https://your-app.herokuapp.com` |
+
+Access in code: `import.meta.env.VITE_API_BASE_URL`
+
+## 🗺 Map Development (Halaman Maps — `/maps`)
+
+- **`react-leaflet` Best Practices**: `MapContainer` MUST have explicit height/width in CSS, otherwise the map won't render
+- **GeoJSON Rendering**: Use `<GeoJSON key={year} />` — the `key` prop forces Leaflet to re-render when epoch changes
+- **Layer Styling**: Consistent green for mangrove polygons; smooth epoch switching
+- **Change Detection (F3)**: Contrasting colors — Red (loss), Blue (gain), Green (unchanged)
+- **Basemaps**: Toggle between OpenStreetMap and Esri Satellite tile layers
+- **Leaflet CSS**: Must import `leaflet/dist/leaflet.css` in `main.jsx`
+
+## 📊 Data Visualization (Halaman Chart — `/chart`)
+
+- Use **Recharts** with data from `GET /api/stats`
+- **Line Chart**: Mangrove area (ha) trend over 2000–2020
+- **Bar Chart**: Delta (ha) between epochs — green bars for gain, red bars for loss
+- **Summary Cards**: 4 metrics — max area, min area, net change, biggest loss epoch
+- Always wrap in `<ResponsiveContainer>` for responsive layout
+
+## 🤖 AI Chat Widget (F6)
+
+- Floating button at bottom-right corner
+- On submit: POST `${VITE_API_BASE_URL}/api/ask` with `{ "question": "..." }`
+- Show loading spinner while waiting; display response in message list
+- **Stateless** — no session memory needed between page refreshes
 
 ## 📡 API Integration & Data Fetching
-- **Endpoints to consume**:
-  - `GET /api/mangrove?year=YYYY`: Fetch GeoJSON for a specific epoch.
-  - `GET /api/stats`: Fetch precomputed statistics (JSON).
-  - `GET /api/years`: Fetch available epochs.
-  - `POST /api/ask`: Submit queries to the AI assistant.
-- Use `useEffect` with standard `fetch` or `axios` for data fetching. Handle loading and error states properly to improve UX.
-- Prevent on-the-fly geospatial calculation in the browser if it can be fetched directly from precomputed backend stats.
 
-## 🎨 UI/UX and Component Architecture
-- **Aesthetic & Theme (Mangrove Vibe)**: Design a UI that feels premium, modern, and deeply connected to nature. 
-  - **Color Palette**: Use curated "Mangrove" colors. 
-    - *Primary/Brand*: Deep Forest Green (`#1E3F20`), Emerald/Vibrant Mangrove Green (`#2E8B57` or `#34A853`).
-    - *Accents*: Oceanic/Bay Blue (`#1E90FF` or `#007BFF`) for interactive elements and water references, Earthy Brown (`#8B4513`) for subtle highlights.
-    - *Backgrounds*: Clean off-white/light gray (`#F8F9FA`) for light mode, or deep rich dark blue/charcoal (`#121820`) for dark mode to make the maps pop.
-  - **Modern UI Elements**: Employ Glassmorphism (translucent backgrounds with `backdrop-filter: blur()`) for floating panels (Navbar, Info Sidebar, AI Chat) so the map remains visible underneath.
-  - **Typography**: Use modern, clean fonts (e.g., *Inter*, *Outfit*, or *Roboto*).
-  - **Micro-animations**: Add smooth hover states, gentle slide-in transitions for panels, and soft shadows to provide depth.
-- **Navigation (F0)**: Ensure the Navbar is persistent and indicates the active route cleanly without page reloads (SPA routing). Give it a glassmorphic effect if it overlays the map.
-- **Sidebar/Panel (F4)**: Build a contextual info panel that updates automatically when a user selects a different epoch or map area. Floating cards with rounded corners (`border-radius: 12px` or `16px`) and soft drop-shadows work best.
-- **Component Splitting**: Keep components focused. For example, separate `MapViewer.jsx`, `EpochSlider.jsx`, `ChatWidget.jsx`, and `StatsChart.jsx`.
+```js
+const API = import.meta.env.VITE_API_BASE_URL || ''
+
+// Fetch GeoJSON for a specific epoch
+const res = await fetch(`${API}/api/mangrove?year=${year}`)
+
+// Fetch precomputed statistics
+const res = await fetch(`${API}/api/stats`)
+
+// Fetch available epochs
+const res = await fetch(`${API}/api/years`)
+
+// Ask AI assistant
+const res = await fetch(`${API}/api/ask`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ question: userInput })
+})
+```
+
+Always handle loading and error states. Do NOT do geospatial calculations in the browser — fetch from precomputed backend data.
+
+## 🎨 UI/UX & Component Architecture
+
+### Aesthetic Theme — "Mangrove Vibe"
+- **Primary**: Deep Forest Green `#1E3F20`, Emerald `#2E8B57`
+- **Accents**: Oceanic Blue `#1E90FF` for interactive elements
+- **Backgrounds**: Dark charcoal `#121820` (dark mode) or off-white `#F8F9FA`
+- **Glassmorphism**: Use `backdrop-filter: blur(10px)` + semi-transparent backgrounds for Navbar, Info Sidebar, AI Chat panel
+- **Typography**: Google Fonts — *Inter*, *Outfit*, or *Roboto*
+- **Micro-animations**: Hover states, slide-in transitions, soft box-shadows
+
+### Recommended Component Split
+```
+src/
+├── pages/
+│   ├── About.jsx         # Static info page
+│   ├── Maps.jsx          # Main map page (F1, F3, F4, F5)
+│   └── Chart.jsx         # Data viz page (F2b)
+├── components/
+│   ├── Navbar.jsx        # Persistent SPA navbar with active state
+│   ├── MapViewer.jsx     # react-leaflet MapContainer + GeoJSON layer
+│   ├── EpochSlider.jsx   # Year slider/dropdown for epoch switching
+│   ├── InfoPanel.jsx     # Contextual sidebar (area, source, year)
+│   ├── ChatWidget.jsx    # Floating AI chat button + panel
+│   └── StatsChart.jsx    # Recharts line + bar charts
+├── App.jsx               # React Router routes
+└── main.jsx              # Entry point (import leaflet.css here)
+```
+
+### Navigation
+- `react-router-dom` `<BrowserRouter>` with `<Routes>` for `/about`, `/maps`, `/chart`
+- Navbar uses `<NavLink>` to show active state without full page reload
+- Glassmorphic navbar with `position: sticky` or `position: fixed` over the map
+
+

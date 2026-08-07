@@ -8,32 +8,96 @@ description: Backend development guidelines for MangroveSight using FastAPI, Pos
 You are an expert Backend Developer for the **MangroveSight** project. The backend serves spatial data (GeoJSON), statistical data (JSON), and proxies AI chat requests using Python and FastAPI.
 
 ## 🛠 Tech Stack & Core Libraries
-- **Framework**: FastAPI (Python 3.9+)
-- **Database**: PostgreSQL with PostGIS extension.
-- **ORM / DB Driver**: `asyncpg` or `SQLAlchemy` (with `GeoAlchemy2` if needed).
-- **Data Validation**: `pydantic` (for request/response schemas).
-- **AI Integration**: Google GenAI SDK (Gemini API) for the `/api/ask` endpoint.
+
+- **Framework**: FastAPI (`fastapi[standard]`)
+- **Database**: PostgreSQL with PostGIS extension (hosted on Heroku Postgres)
+- **ORM / DB Driver**: `SQLAlchemy` (synchronous) + `psycopg2-binary` driver + `GeoAlchemy2` for spatial types
+  - **Do NOT use `asyncpg`** — the project uses synchronous SQLAlchemy (`create_engine`, not `create_async_engine`)
+- **Migrations**: `alembic` — use for any schema changes to the `mangrove_extents` table
+- **Settings Management**: `pydantic-settings` — load `DATABASE_URL` and `GEMINI_API_KEY` from environment
+- **AI Integration**: Google GenAI SDK (Gemini Flash 2.0) for the `/api/ask` endpoint
+- **Spatial Utilities**: `shapely` — geometry manipulation if needed server-side
 
 ## 🏗 API Architecture & Endpoints
-The backend must implement the following core routes (as defined in the PRD):
-1. **`GET /api/mangrove?year=YYYY`**: Fetches spatial data for a given epoch. Must return valid **GeoJSON** format (using `ST_AsGeoJSON()` at the database level).
-2. **`GET /api/stats`**: Fetches precomputed summary statistics (JSON) used by the frontend charts and the AI context.
-3. **`GET /api/years`**: Returns a list of available epochs (e.g., `[2000, 2007, 2008, ...]`).
-4. **`POST /api/ask`**: Acts as a proxy to the Gemini API for the chat widget.
 
-## 🤖 AI Endpoint (`/api/ask`) Best Practices
-- **Strict Context Injection**: Fetch the precomputed statistics (from DB or a JSON file) and inject them into the system prompt of the Gemini model. 
-- **Stateless & Grounded**: Instruct the LLM to *only* answer based on the injected data. Do not execute spatial SQL queries (like `ST_Area` or `ST_Intersects`) dynamically based on user prompts.
-- **Error Handling**: Implement `try-except` blocks for Gemini API calls to handle rate limits or timeouts gracefully.
+### `GET /api/mangrove?year=YYYY`
+- Queries `mangrove_extents` PostGIS table; returns **GeoJSON FeatureCollection**
+- Use `ST_AsGeoJSON()` at the DB level, not in Python
+- Valid years: `[2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]`
+- Return 400 for invalid year, 404 if no data found
+
+### `GET /api/years`
+- Returns list of available epochs as integers
+- Response: `{ "years": [2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020] }`
+
+### `GET /api/stats`
+- Returns precomputed statistics — read from DB or `mangrove_stats.json`
+- **Never compute statistics on-the-fly** with `ST_Area` — use precomputed values only
+- Response schema must match the `mangrove_stats.json` structure exactly:
+  ```python
+  class EpochStats(BaseModel):
+      year: int
+      area_ha: float
+      polygon_count: int
+      delta_ha: Optional[float]
+      delta_pct: Optional[float]
+      prev_year: Optional[int]
+
+  class StatsResponse(BaseModel):
+      metadata: dict
+      summary: dict
+      epochs: List[EpochStats]
+  ```
+
+### `POST /api/ask`
+- Request body: `{ "question": "..." }`
+- Fetches precomputed stats JSON, injects as Gemini system context
+- System prompt must include: *"Answer ONLY based on the provided JSON data."*
+- Apply rate limiting (max 20 req/min) to control API costs
+- Return 429 if rate limit exceeded
+
+## 🤖 AI Endpoint Best Practices
+
+- **Grounded Responses**: Instruct LLM to stay within precomputed data context; politely refuse off-topic questions
+- **Stateless**: Single-turn Q&A only — no session memory
+- **Error Handling**: Wrap Gemini calls in `try-except` for rate limits and timeouts
 
 ## 🗄️ Database (PostGIS) Rules
-- **Connection**: Connect securely using `DATABASE_URL` from environment variables.
-- **Precomputed First**: Rely on precomputed area/delta columns. Avoid running heavy spatial operations during API requests unless absolutely necessary (e.g., just formatting as GeoJSON).
+
+- **Connection**: Load `DATABASE_URL` via `pydantic-settings`. Fix Heroku's deprecated prefix: `url.replace("postgres://", "postgresql://", 1)`
+- **Table schema**: `mangrove_extents` with columns `year INTEGER`, `geometry GEOMETRY(Geometry, 4326)`
+- **Spatial Index**: Table has GIST on `geometry` and B-tree on `year` — leverage these in WHERE clauses
+- **Alembic**: Use `alembic revision --autogenerate` for schema changes; never use `Base.metadata.create_all()` in production
+
+## 📁 Recommended File Structure
+
+```
+backend/
+├── main.py              # FastAPI app, CORS config, router inclusion
+├── db.py                # SQLAlchemy engine + session dependency
+├── settings.py          # pydantic-settings Settings class
+├── schemas.py           # Pydantic response models
+├── routers/
+│   ├── mangrove.py      # GET /api/mangrove
+│   ├── stats.py         # GET /api/stats, GET /api/years
+│   └── ai.py            # POST /api/ask
+├── requirements.txt
+├── Procfile             # web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}
+└── .env                 # LOCAL ONLY — never commit
+```
 
 ## 🔒 Security & Configuration
-- **Environment Variables**: NEVER hardcode API keys or database URIs. Use `os.getenv` or `pydantic-settings` to load `GEMINI_API_KEY` and `DATABASE_URL`.
-- **CORS (Cross-Origin Resource Sharing)**: Configure `CORSMiddleware` in the main FastAPI app. Ensure the origin matches the Netlify frontend URL to prevent browser blocks in production.
+
+- **Never hardcode** `DATABASE_URL`, `GEMINI_API_KEY`, or `CORS_ORIGINS`
+- Use `pydantic-settings` to load all config from environment
+- **CORS**: Configure `CORSMiddleware` from the start; use `CORS_ORIGINS` env var for Netlify URL
 
 ## 🚀 Deployment (Heroku)
-- Ensure the presence of a valid `Procfile` (e.g., `web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}`).
-- Ensure all dependencies (including production servers like `uvicorn` and `gunicorn`) are listed in `requirements.txt`.
+
+- **Procfile**: `web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}`
+- All production dependencies (including `uvicorn`) must be in `requirements.txt`
+- **Heroku Config Vars** (NOT GitHub Secrets): `DATABASE_URL`, `GEMINI_API_KEY`, `CORS_ORIGINS`
+- Heroku auto-provides `DATABASE_URL` when Heroku Postgres add-on is attached
+
+
+
