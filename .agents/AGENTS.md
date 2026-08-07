@@ -35,3 +35,6 @@ These rules apply universally to all AI agents working on the **MangroveSight** 
 - **Jangan Campur Interpreter**: Jangan menjalankan script data-pipeline menggunakan interpreter sistem (`/usr/bin/python3`) atau interpreter backend. Selalu aktifkan `.venv` terlebih dahulu: `source data-pipeline/.venv/bin/activate`.
 - **IDE Interpreter**: Pastikan VS Code menggunakan interpreter dari `.venv` (dikonfigurasi via `.vscode/settings.json` dengan `python.defaultInterpreterPath`). Jika ada error "Cannot find module" di IDE, ini tandanya interpreter IDE belum diarahkan ke `.venv`.
 - **`.venv` tidak di-commit**: Direktori `.venv` selalu ada di `.gitignore`. Jangan pernah commit virtual environment ke Git.
+
+## 8. Git Operation Rules
+- **No Automatic Commits/Pushes**: AI/Agent **DILARANG KERAS** melakukan operasi `git commit` atau `git push` secara otomatis. Semua tahap commit dan push ke GitHub (terutama branch `master`) harus diserahkan sepenuhnya kepada *User*. Biarkan *User* yang melakukan commit dan push secara manual sesuai dengan milestone pekerjaan mereka.

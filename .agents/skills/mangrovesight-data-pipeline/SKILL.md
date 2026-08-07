@@ -28,7 +28,7 @@ The pipeline consists of **3 sequential scripts** that must be run in order:
   source .venv/bin/activate
   pip install -r requirements-pipeline.txt
   ```
-- **Local Database**: Use Docker to run a local PostGIS database for Script 03. A `docker-compose.yml` is provided at the root of the project. Simply run `docker-compose up -d`.
+- **Local Database**: Use Docker to run a local PostGIS database for Script 03. A `docker-compose.yml` is provided in the `backend/` directory. Run `cd backend && docker-compose up -d`.
 - **Core Libraries**:
   - `geopandas` — spatial data reading/writing, CRS reprojection
   - `shapely` — geometry operations
