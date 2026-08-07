@@ -23,3 +23,15 @@ These rules apply universally to all AI agents working on the **MangroveSight** 
 - Berikan penamaan variabel dan fungsi menggunakan bahasa Inggris yang jelas (contoh: `calculateArea`, `getMangroveEpochs`).
 - Berikan *comment* pada kode yang kompleks.
 - Jika melakukan perubahan UI/UX, pastikan untuk selalu mengingat estetika **"Mangrove Vibe"** (hijau hutan, biru laut, dan desain modern *glassmorphism*).
+
+## 6. Data Pipeline (PENTING)
+- **Urutan Eksekusi Wajib**: Script data-pipeline harus selalu dijalankan secara berurutan: `01_clip_mangrove.py` → `02_precompute_stats.py` → `03_import_to_postgis.py`. Jangan melewati atau mengubah urutan ini.
+- **Single Source of Truth untuk Statistik**: File `output/stats/mangrove_stats.json` adalah satu-satunya sumber data angka (luas, delta, persentase). Backend dan AI assistant harus membaca dari file/tabel ini — **dilarang** menghitung ulang statistik secara *on-the-fly* di backend atau frontend.
+- **Schema JSON Immutable**: Struktur output JSON dari Script 02 (`metadata`, `summary`, `epochs`) **tidak boleh diubah** tanpa juga memperbarui Pydantic schema di backend FastAPI. Perubahan ini bersifat *breaking change*.
+- **Bounding Box Tetap**: Batas area kliping Teluk Balikpapan `(116.7, -1.6, 117.1, -1.1)` dan EPSG untuk kalkulasi (`EPSG:32750`) **tidak boleh diubah**.
+
+## 7. Python Virtual Environment
+- **Isolasi Dependensi**: Seluruh dependensi data-pipeline dikelola secara **terpisah** dari backend. Gunakan virtual environment lokal di `data-pipeline/.venv/`.
+- **Jangan Campur Interpreter**: Jangan menjalankan script data-pipeline menggunakan interpreter sistem (`/usr/bin/python3`) atau interpreter backend. Selalu aktifkan `.venv` terlebih dahulu: `source data-pipeline/.venv/bin/activate`.
+- **IDE Interpreter**: Pastikan VS Code menggunakan interpreter dari `.venv` (dikonfigurasi via `.vscode/settings.json` dengan `python.defaultInterpreterPath`). Jika ada error "Cannot find module" di IDE, ini tandanya interpreter IDE belum diarahkan ke `.venv`.
+- **`.venv` tidak di-commit**: Direktori `.venv` selalu ada di `.gitignore`. Jangan pernah commit virtual environment ke Git.
