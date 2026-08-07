@@ -19,7 +19,7 @@ graph TD
         Map["react-leaflet MapViewer"]
         Chart["Recharts DataViz"]
         Chat["AI Chat Widget"]
-        
+      
         UI --> Map
         UI --> Chart
         UI --> Chat
@@ -47,7 +47,7 @@ graph TD
     %% Relationships
     User -->|Interacts| UI
     Map -->|Fetches Tiles| OSM
-    
+  
     Map -->|GET GeoJSON| API_Mangrove
     Chart -->|GET JSON| API_Stats
     Chat -->|POST Question| API_Ask
@@ -65,6 +65,7 @@ graph TD
 ## 2. Component Details
 
 ### 2.1. Frontend (WebGIS Client)
+
 - **Tech Stack**: React JS, Vite, React Router v6.
 - **Responsibility**: Provides the user interface, renders interactive maps, displays statistical charts, and handles user interactions.
 - **Key Libraries**:
@@ -73,6 +74,7 @@ graph TD
 - **Hosting**: Netlify.
 
 ### 2.2. Backend (API & AI Proxy)
+
 - **Tech Stack**: Python, FastAPI.
 - **Responsibility**: Serves geospatial data to the map, provides statistical data to the charts, and securely acts as a proxy for the AI assistant.
 - **Key Endpoints**:
@@ -82,11 +84,13 @@ graph TD
 - **Hosting**: Heroku (Web Dyno).
 
 ### 2.3. Database (Spatial & Stats)
+
 - **Tech Stack**: PostgreSQL with PostGIS extension.
 - **Responsibility**: Stores the clipped spatial data of mangrove extents (2000-2020) and the precomputed statistical data.
 - **Hosting**: Heroku Postgres (Add-on).
 
 ### 2.4. Data Pipeline (Offline Preprocessing)
+
 - **Tech Stack**: QGIS, Python, GDAL.
 - **Responsibility**: A set of scripts that runs offline before deployment. It clips the global GMW data to the Teluk Balikpapan bounding box, calculates area (ha) and delta changes between epochs, exports statistics as JSON, and pushes the spatial data to PostGIS.
 
