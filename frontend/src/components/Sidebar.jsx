@@ -3,12 +3,13 @@ import {
   Box, 
   Paper, 
   Typography, 
-  Slider, 
   Select, 
   MenuItem, 
   FormControl, 
   InputLabel,
-  Divider
+  Divider,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import { 
   LineChart, 
@@ -20,7 +21,18 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 
-const Sidebar = ({ years, selectedYear, onYearChange, stats }) => {
+const Sidebar = ({ 
+  years, 
+  selectedYear, 
+  onYearChange, 
+  stats,
+  compareMode,
+  setCompareMode,
+  compareYear,
+  setCompareYear,
+  heatmapActive,
+  setHeatmapActive
+}) => {
   
   // Format the Recharts data
   const chartData = stats?.epochs?.map(epoch => ({
@@ -62,12 +74,12 @@ const Sidebar = ({ years, selectedYear, onYearChange, stats }) => {
         Pilih Tahun
       </Typography>
 
-      <FormControl fullWidth sx={{ mb: 4 }}>
-        <InputLabel id="year-select-label">Tahun Epoch</InputLabel>
+      <FormControl fullWidth sx={{ mb: compareMode ? 2 : 4 }}>
+        <InputLabel id="year-select-label">{compareMode ? "Tahun Dasar" : "Tahun Epoch"}</InputLabel>
         <Select
           labelId="year-select-label"
           value={selectedYear || ''}
-          label="Tahun Epoch"
+          label={compareMode ? "Tahun Dasar" : "Tahun Epoch"}
           onChange={(e) => onYearChange(e.target.value)}
         >
           {years.map((year) => (
@@ -75,6 +87,62 @@ const Sidebar = ({ years, selectedYear, onYearChange, stats }) => {
           ))}
         </Select>
       </FormControl>
+
+      {compareMode && (
+        <FormControl fullWidth sx={{ mb: 4 }}>
+          <InputLabel id="compare-year-select-label">Tahun Pembanding</InputLabel>
+          <Select
+            labelId="compare-year-select-label"
+            value={compareYear || ''}
+            label="Tahun Pembanding"
+            onChange={(e) => setCompareYear(e.target.value)}
+          >
+            {years.map((year) => (
+              <MenuItem key={year} value={year}>{year}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+
+      <Divider sx={{ mb: 2 }} />
+
+      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+        Mode Analisis Tingkat Lanjut
+      </Typography>
+      
+      <FormControlLabel
+        control={
+          <Switch 
+            checked={compareMode} 
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setCompareMode(isChecked);
+              if (isChecked) setHeatmapActive(false);
+            }} 
+            color="primary" 
+          />
+        }
+        label={<Typography variant="body2">Mode Perbandingan (Change Detection)</Typography>}
+        sx={{ mb: 1 }}
+      />
+      
+      <FormControlLabel
+        control={
+          <Switch 
+            checked={heatmapActive} 
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setHeatmapActive(isChecked);
+              if (isChecked) setCompareMode(false);
+            }} 
+            color="secondary" 
+          />
+        }
+        label={<Typography variant="body2">Heatmap Kepadatan</Typography>}
+        sx={{ mb: 3 }}
+      />
+
+      <Divider sx={{ mb: 3 }} />
 
       <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
         Statistik Area {selectedYear}
@@ -87,7 +155,7 @@ const Sidebar = ({ years, selectedYear, onYearChange, stats }) => {
         </Typography>
       </Box>
 
-      {currentEpochStat && currentEpochStat.delta_ha != null && currentEpochStat.delta_ha !== 0 && (
+      {!compareMode && currentEpochStat && currentEpochStat.delta_ha != null && currentEpochStat.delta_ha !== 0 && (
         <Box sx={{ p: 2, bgcolor: currentEpochStat.delta_ha > 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)', borderRadius: 2, mb: 4 }}>
           <Typography variant="body2" color="text.secondary">Perubahan dari sebelumnya</Typography>
           <Typography variant="h5" sx={{ color: currentEpochStat.delta_ha > 0 ? '#2E7D32' : '#C62828', fontWeight: 'bold' }}>
@@ -97,6 +165,24 @@ const Sidebar = ({ years, selectedYear, onYearChange, stats }) => {
               <> ({currentEpochStat.delta_pct > 0 ? '+' : ''}{currentEpochStat.delta_pct.toFixed(2)}%)</>
             )}
           </Typography>
+        </Box>
+      )}
+
+      {compareMode && (
+        <Box sx={{ p: 2, bgcolor: 'rgba(255, 152, 0, 0.1)', borderRadius: 2, mb: 4 }}>
+          <Typography variant="body2" color="text.secondary">Legenda Perbandingan</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: '#FF5252', borderRadius: '50%', mr: 1 }} />
+            <Typography variant="caption">Hilang (Loss)</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: '#00E5FF', borderRadius: '50%', mr: 1 }} />
+            <Typography variant="caption">Bertambah (Gain)</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: '#00BFA5', borderRadius: '50%', mr: 1 }} />
+            <Typography variant="caption">Tetap (Stable)</Typography>
+          </Box>
         </Box>
       )}
 

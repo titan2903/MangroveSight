@@ -6,6 +6,7 @@ import * as L from 'leaflet';
 import ForestIcon from '@mui/icons-material/Forest';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import LayersIcon from '@mui/icons-material/Layers';
+import HeatmapLayer from './HeatmapLayer';
 
 const { BaseLayer } = LayersControl;
 
@@ -32,7 +33,7 @@ const getAreaHa = (feature) => {
 };
 
 // ─── Main Component ──────────────────────────────────────────────────────
-const MapViewer = ({ data, loading, year }) => {
+const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear, compareMode }) => {
   const [showYearBadge, setShowYearBadge] = useState(false);
   const [clickedInfo, setClickedInfo] = useState(null);
   const prevYear = useRef(null);
@@ -52,33 +53,47 @@ const MapViewer = ({ data, loading, year }) => {
 
   const onEachFeature = useCallback((feature, layer) => {
     const area = getAreaHa(feature);
+    const status = feature.properties?.status;
+    const baseColor = feature.properties?.color || '#00BFA5';
+    const statusLabel = feature.properties?.desc ? `Status: <b>${feature.properties.desc}</b><br/>` : '';
+
     const tooltipHtml = `
       <div style="text-align:center; font-family:'Inter',sans-serif; min-width:130px;">
         <div style="color:#004D40; font-weight:700; font-size:0.9rem; margin-bottom:4px;">🌿 Mangrove Patch</div>
-        <div style="font-size:0.8rem; color:#555;">Tahun: <b>${year}</b></div>
-        ${area !== '—' ? `<div style="font-size:0.8rem; color:#555;">Luas: <b>${Number(area).toFixed(2)} ha</b></div>` : ''}
-        <div style="font-size:0.72rem; color:#999; margin-top:3px;">Klik untuk zoom</div>
+        <div style="font-size:0.8rem; color:#555;">Tahun: <b>${compareMode ? `${year} vs ${compareYear}` : year}</b></div>
+        ${statusLabel}
+        ${area !== '—' && !compareMode ? `<div style="font-size:0.8rem; color:#555;">Luas: <b>${Number(area).toFixed(2)} ha</b></div>` : ''}
       </div>
     `;
     layer.bindTooltip(tooltipHtml, { sticky: true, className: 'custom-tooltip', offset: [15, 0] });
 
     layer.on({
       mouseover: (e) => {
-        e.target.setStyle({ weight: 3, color: '#64FFDA', fillColor: '#00E5FF', fillOpacity: 0.85 });
+        e.target.setStyle({ weight: 3, color: '#FFFFFF', fillColor: baseColor, fillOpacity: 0.9 });
         e.target.bringToFront();
       },
       mouseout: (e) => {
-        e.target.setStyle({ weight: 1, color: '#00BFA5', fillColor: '#00BFA5', fillOpacity: 0.6 });
+        e.target.setStyle({ weight: 1, color: baseColor, fillColor: baseColor, fillOpacity: compareMode ? 0.8 : 0.6 });
       },
       click: (e) => {
         const target = e.target;
         const map = target._map;
-        map.flyToBounds(target.getBounds(), { padding: [80, 80], duration: 1.2, easeLinearity: 0.25 });
-        // Show a quick floating info near click
+        
+        try {
+          if (typeof target.getBounds === 'function') {
+            map.flyToBounds(target.getBounds(), { padding: [80, 80], duration: 1.2, easeLinearity: 0.25 });
+          } else if (typeof target.getLatLng === 'function') {
+            // For Point geometries (Leaflet Markers), getBounds() doesn't exist. Fly to the point instead.
+            map.flyTo(target.getLatLng(), 15, { duration: 1.2, easeLinearity: 0.25 });
+          }
+        } catch (error) {
+          console.warn("Could not zoom to feature:", error);
+        }
+        
         setClickedInfo({ lat: e.latlng.lat, lng: e.latlng.lng, area });
       }
     });
-  }, [year]);
+  }, [year, compareYear, compareMode]);
 
   return (
     <Box sx={{ height: '100%', width: '100%', position: 'relative' }} onClick={handleMapClick}>
@@ -121,9 +136,9 @@ const MapViewer = ({ data, loading, year }) => {
           </BaseLayer>
         </LayersControl>
 
-        {data && (
+        {data && !compareMode && (
           <GeoJSON
-            key={year}
+            key={`data-${year}`}
             data={data}
             style={{
               color: '#00BFA5',
@@ -132,9 +147,45 @@ const MapViewer = ({ data, loading, year }) => {
               fillOpacity: 0.6,
             }}
             onEachFeature={onEachFeature}
+            pointToLayer={(feature, latlng) => {
+              return L.circleMarker(latlng, {
+                radius: 5,
+                color: '#FFFFFF',
+                weight: 1,
+                fillColor: '#00BFA5',
+                fillOpacity: 0.8
+              });
+            }}
           />
         )}
-        <FitBounds data={data} />
+        
+        {compareData && compareMode && (
+          <GeoJSON
+            key={`compare-${year}-${compareYear}`}
+            data={compareData}
+            style={(feature) => ({
+              color: feature.properties.color || '#00BFA5',
+              weight: 1,
+              fillColor: feature.properties.color || '#00BFA5',
+              fillOpacity: 0.8,
+            })}
+            onEachFeature={onEachFeature}
+            pointToLayer={(feature, latlng) => {
+              const baseColor = feature.properties?.color || '#00BFA5';
+              return L.circleMarker(latlng, {
+                radius: 5,
+                color: '#FFFFFF',
+                weight: 1,
+                fillColor: baseColor,
+                fillOpacity: 0.9
+              });
+            }}
+          />
+        )}
+
+        {heatmapData && <HeatmapLayer points={heatmapData} />}
+
+        <FitBounds data={compareMode ? compareData : data} />
       </MapContainer>
 
       {/* ── Animated Year Badge ──────────────────────────── */}
@@ -161,7 +212,7 @@ const MapViewer = ({ data, loading, year }) => {
               TUTUPAN MANGROVE
             </Typography>
             <Typography variant="h2" sx={{ color: '#fff', fontWeight: 900, lineHeight: 1, my: 0.5 }}>
-              {year}
+              {compareMode ? `${year} vs ${compareYear}` : year}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.75)' }}>
               Teluk Balikpapan

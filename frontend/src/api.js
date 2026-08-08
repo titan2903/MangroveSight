@@ -9,6 +9,16 @@ export const fetchMangroveGeoJSON = async (year) => {
   return response.data;
 };
 
+export const fetchMangroveComparison = async (year1, year2) => {
+  const response = await api.get(`/mangrove/compare/?year1=${year1}&year2=${year2}`);
+  return response.data;
+};
+
+export const fetchMangroveHeatmap = async (year) => {
+  const response = await api.get(`/mangrove/heatmap/?year=${year}`);
+  return response.data;
+};
+
 export const fetchStats = async () => {
   const response = await api.get('/stats/');
   return response.data;
