@@ -8,7 +8,7 @@ Cara Penggunaan:
   1. Unduh file shapefile dari link di atas.
   2. Letakkan file-file tersebut di dalam folder: data-pipeline/input/
   3. Pastikan naming convention:
-       - GMW v3.0 per tahun  → input/GMW_v3_YYYY.shp
+       - GMW v3.0 per tahun  → input/gmw_v3_YYYY_vec/gmw_v3_YYYY_vec.shp
   4. Jalankan script ini:
        cd data-pipeline
        python 01_clip_mangrove.py
@@ -33,16 +33,16 @@ BALIKPAPAN_BBOX = (116.60, -1.55, 117.15, -1.00)
 # Sesuaikan nama file di sini jika nama file download dari Zenodo berbeda.
 # =============================================================================
 EPOCH_FILE_MAPPING = {
-    2007: "GMW_v3_2007.shp",
-    2008: "GMW_v3_2008.shp",
-    2009: "GMW_v3_2009.shp",
-    2010: "GMW_v3_2010.shp",
-    2015: "GMW_v3_2015.shp",
-    2016: "GMW_v3_2016.shp",
-    2017: "GMW_v3_2017.shp",
-    2018: "GMW_v3_2018.shp",
-    2019: "GMW_v3_2019.shp",
-    2020: "GMW_v3_2020.shp",
+    2007: "gmw_v3_2007_vec/gmw_v3_2007_vec.shp",
+    2008: "gmw_v3_2008_vec/gmw_v3_2008_vec.shp",
+    2009: "gmw_v3_2009_vec/gmw_v3_2009_vec.shp",
+    2010: "gmw_v3_2010_vec/gmw_v3_2010_vec.shp",
+    2015: "gmw_v3_2015_vec/gmw_v3_2015_vec.shp",
+    2016: "gmw_v3_2016_vec/gmw_v3_2016_vec.shp",
+    2017: "gmw_v3_2017_vec/gmw_v3_2017_vec.shp",
+    2018: "gmw_v3_2018_vec/gmw_v3_2018_vec.shp",
+    2019: "gmw_v3_2019_vec/gmw_v3_2019_vec.shp",
+    2020: "gmw_v3_2020_vec/gmw_v3_2020_vec.shp",
 }
 
 # Direktori input (folder tempat meletakkan shapefile yang diunduh)
