@@ -1,5 +1,5 @@
 *# Product Requirements Document (PRD)
-## MangroveSight — Sistem WebGIS Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan (2000–2020)
+## MangroveSight — Sistem WebGIS Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan (2007–2020)
 
 | Field | Value |
 |---|---|
@@ -22,7 +22,7 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
 
 ## 2. Tujuan Project
 
-1. Membangun WebGIS yang memvisualisasikan sebaran & perubahan hutan mangrove Teluk Balikpapan periode **2000–2020** (11 epoch; kombinasi GMW v4.0 untuk tahun 2000 dan GMW v3.0 untuk 2007–2020).
+1. Membangun WebGIS yang memvisualisasikan sebaran & perubahan hutan mangrove Teluk Balikpapan periode **2007–2020** (10 epoch; bersumber dari GMW v3.0).
 2. Menyediakan analisis kuantitatif otomatis (luas area, laju perubahan) per epoch.
 3. Menyediakan asisten AI ringan di frontend yang membantu pengguna memahami data tanpa perlu membaca tabel mentah.
 4. Deliverable selesai dan ter-deploy dalam **4 minggu**.
@@ -39,7 +39,7 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
 
 ### 4.1 In Scope
 - Wilayah studi: Teluk Balikpapan (bounding box tetap, tidak seluruh Kalimantan)
-- Rentang waktu: **2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020** (11 epoch; epoch 2000 dari GMW v4.0, sisanya GMW v3.0)
+- Rentang waktu: **2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020** (10 epoch; bersumber dari GMW v3.0)
 - Navigasi multi-halaman: **About**, **Maps**, **Chart**
 - Visualisasi peta interaktif per epoch (halaman Maps)
 - Grafik chart tren luas mangrove (halaman Chart)
@@ -71,9 +71,9 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
 
 ### F1 — Peta Interaktif Multi-Epoch (Halaman Maps)
 - **Deskripsi:** Menampilkan layer polygon sebaran mangrove per epoch di atas basemap (OSM/Esri Satellite).
-- **Interaksi:** Slider atau dropdown untuk berpindah antar tahun (2000 → 2020).
+- **Interaksi:** Slider atau dropdown untuk berpindah antar tahun (2007 → 2020).
 - **Acceptance Criteria:**
-  - User bisa switch antar 11 epoch dalam < 2 detik render time.
+  - User bisa switch antar 10 epoch dalam < 2 detik render time.
   - Layer mangrove ditampilkan dengan styling warna konsisten (hijau) di atas basemap.
 
 ### F2 — Kalkulasi Luas Area Otomatis
@@ -85,9 +85,9 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
 ### F2b — Halaman Chart: Grafik Tren & Statistik
 - **Deskripsi:** Halaman tersendiri yang menampilkan visualisasi statistik berupa grafik interaktif. Tidak ada peta di halaman ini — murni data viz.
 - **Konten grafik yang ditampilkan:**
-  - **Line Chart:** Tren luas mangrove (ha) dari tahun 2000 hingga 2020 per epoch.
+  - **Line Chart:** Tren luas mangrove (ha) dari tahun 2007 hingga 2020 per epoch.
   - **Bar Chart:** Perubahan luas (delta ha) antar-epoch — batang merah untuk loss, hijau untuk gain.
-  - **Summary Cards:** Total luas tertinggi, total luas terendah, total net loss/gain selama 2000–2020, epoch dengan penurunan paling drastis.
+  - **Summary Cards:** Total luas tertinggi, total luas terendah, total net loss/gain selama 2007–2020, epoch dengan penurunan paling drastis.
 - **Library:** Recharts (kompatibel dengan React, ringan, tidak perlu setup ekstra).
 - **Data source:** Endpoint `/api/stats` yang mengembalikan statistik precomputed (JSON).
 - **Acceptance Criteria:**
@@ -96,7 +96,7 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
   - Chart responsif terhadap ukuran container.
 
 ### F3 — Perbandingan Antar-Epoch (Change Detection View)
-- **Deskripsi:** User bisa memilih 2 epoch (misal 2000 vs 2020) untuk melihat area yang hilang (loss) dan bertambah (gain).
+- **Deskripsi:** User bisa memilih 2 epoch (misal 2007 vs 2020) untuk melihat area yang hilang (loss) dan bertambah (gain).
 - **Acceptance Criteria:**
   - Overlay visual dengan warna berbeda: merah (loss), biru (gain), hijau (tetap).
   - Statistik ringkas: total loss (ha), total gain (ha), net change (%).
@@ -148,13 +148,12 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
 
 | Data | Sumber | Format | Catatan |
 |---|---|---|---|
-| Sebaran mangrove epoch 2000 | **GMW v4.0** (Zenodo: 10.5281/zenodo.12756047) | Shapefile → clip ke Teluk Balikpapan | Epoch 2000 (window 1998–2002); resolusi 30m |
 | Sebaran mangrove epoch 2007–2020 | **GMW v3.0** (Zenodo/UNEP-WCMC) | Shapefile → clip ke Teluk Balikpapan | 10 epoch: 2007, 2008, 2009, 2010, 2015–2020 |
 | Basemap | OpenStreetMap / Esri Satellite | Tile layer | Via Leaflet tile provider |
 | Batas administrasi (opsional) | GADM / BIG | Shapefile | Untuk konteks wilayah di halaman About/Maps |
 | Ringkasan statistik (untuk AI & Chart) | Precomputed dari data GMW | JSON | Dibuat saat preprocessing; dipakai F2b dan F6 |
 
-> ⚠️ **Catatan:** Epoch tahun 2000 menggunakan GMW v4.0 (window 1998–2002, resolusi 30m), sedangkan epoch 2007–2020 menggunakan GMW v3.0 (resolusi 25m). Ada perbedaan resolusi kecil antar sumber yang perlu dicantumkan sebagai limitasi di halaman About.
+> ⚠️ **Catatan:** Epoch 2007–2020 menggunakan GMW v3.0 (resolusi 25m).
 
 ## 8. Tech Stack
 
@@ -251,7 +250,7 @@ mangrove-sight/
 
 | Minggu | Fokus | Output Target |
 |---|---|---|
-| **1** | Data Pipeline + Backend + CI/CD Setup | Data GMW (2000 & 2007–2020) ter-clip & masuk PostGIS Heroku; semua endpoint FastAPI jalan; GitHub Actions pipeline terkonfigurasi (auto-deploy sudah aktif) |
+| **1** | Data Pipeline + Backend + CI/CD Setup | Data GMW (2007–2020) ter-clip & masuk PostGIS Heroku; semua endpoint FastAPI jalan; GitHub Actions pipeline terkonfigurasi (auto-deploy sudah aktif) |
 | **2** | Frontend Core — Navbar, Maps, About (F0, F1, F4, F5) | SPA dengan React Router; halaman About statis; peta Leaflet dengan epoch slider/dropdown; info panel & legend; auto-deploy ke Netlify via push ke `master` |
 | **3** | Chart, Analisis & AI (F2, F2b, F3, F6) | Halaman Chart dengan line + bar chart (Recharts); kalkulasi luas; change detection overlay; chat widget AI terhubung ke Gemini API |
 | **4** | Polish, F7 (opsional), Finalisasi | Styling konsisten antar halaman; testing end-to-end; validasi CI/CD pipeline; dokumentasi README; slide presentasi |
@@ -261,7 +260,7 @@ Setup CI/CD di awal (bukan di akhir) adalah keputusan krusial — setelah pipeli
 
 ## 10. Success Metrics
 
-- Seluruh 11 epoch (2000, 2007–2020) ter-render dengan benar di halaman Maps.
+- Seluruh 10 epoch (2007–2020) ter-render dengan benar di halaman Maps.
 - Kalkulasi luas area akurat dibanding sumber GMW asli (toleransi margin kecil dari proses clip wilayah).
 - Halaman Chart menampilkan minimal 2 jenis grafik (line + bar) dengan data real dari PostGIS.
 - AI Insight Assistant menjawab minimal 90% pertanyaan dasar (luas per tahun, tren umum) dengan benar berdasarkan data precomputed.
@@ -273,9 +272,7 @@ Setup CI/CD di awal (bukan di akhir) adalah keputusan krusial — setelah pipeli
 
 | Risiko | Dampak | Mitigasi |
 |---|---|---|
-| Proses clip data GMW ke wilayah studi lebih rumit dari perkiraan | Delay Minggu 1 | Siapkan buffer 2–3 hari; gunakan QGIS untuk clip manual dulu sebelum otomatisasi script Python |
-| Epoch 2000 (GMW v4.0) memiliki resolusi/format berbeda dengan v3.0 | Inkonsistensi visualisasi antar epoch | Seragamkan proyeksi (EPSG:4326) dan format saat import ke PostGIS; catat perbedaan sebagai limitasi di halaman About |
-| Heroku free tier dihapus; cold start dyno lambat | Performa buruk / biaya | Gunakan Heroku Eco Dyno ($5/bulan) untuk menghindari sleep; atau tambahkan health-check ping untuk keep-alive |
+| Perbedaan format data GMW v3.0 | Inkonsistensi visualisasi | Seragamkan proyeksi (EPSG:4326) dan format saat import ke PostGIS |
 | GitHub Actions gagal deploy (misconfigured secrets) | Delay pipeline | Uji pipeline CI/CD di Minggu 1 dengan dummy endpoint sebelum data siap |
 | CORS error antara Netlify frontend dan Heroku backend | Fitur tidak berjalan di production | Konfigurasikan CORS di FastAPI dari awal (`origins=["https://your-netlify-url"]`) |
 | Biaya API LLM membengkak jika trafik tinggi | Biaya tak terduga | Set rate limit di endpoint `/api/ask`; gunakan `Gemini Flash 2.0` (lebih murah) untuk chat sederhana |
@@ -297,9 +294,8 @@ Setup CI/CD di awal (bukan di akhir) adalah keputusan krusial — setelah pipeli
 
 **Data, Tools & Dokumentasi:**
 1. Global Mangrove Watch v3.0 Dataset (epoch 2007–2020) — https://zenodo.org/records/6894273
-2. Global Mangrove Watch v4.0 Dataset (epoch 2000) — https://zenodo.org/records/12756047
-3. UNEP-WCMC Ocean Data Viewer (per-epoch download) — https://data.unep-wcmc.org/datasets/45
-4. GMW v3.0 Paper: Bunting et al. (2022), *Global Mangrove Extent Change 1996–2020*, Remote Sensing 14(15): 3657.
+2. UNEP-WCMC Ocean Data Viewer (per-epoch download) — https://data.unep-wcmc.org/datasets/45
+3. GMW v3.0 Paper: Bunting et al. (2022), *Global Mangrove Extent Change 1996–2020*, Remote Sensing 14(15): 3657.
 5. FastAPI — https://fastapi.tiangolo.com
 6. React Router v6 — https://reactrouter.com
 7. react-leaflet — https://react-leaflet.js.org

@@ -50,10 +50,9 @@ The pipeline consists of **3 sequential scripts** that must be run in order:
 
 | Epoch | Source |
 |-------|--------|
-| 2000 | Global Mangrove Watch **v4.0** (Zenodo: `10.5281/zenodo.12756047`) |
 | 2007–2020 | Global Mangrove Watch **v3.0** (Zenodo: `10.5281/zenodo.6894273`) |
 
-**Expected epochs**: `[2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]`
+**Expected epochs**: `[2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]`
 
 ## 📐 Script 01 — Clipping Rules
 
@@ -67,12 +66,12 @@ The pipeline consists of **3 sequential scripts** that must be run in order:
 
 - Calculate area using **UTM projection** (`EPSG:32750`), then convert: `area_m2 / 10_000 = area_ha`.
 - Round area to **2 decimal places**.
-- Compute `delta_ha` and `delta_pct` between consecutive epochs (not from year 2000 always).
+- Compute `delta_ha` and `delta_pct` between consecutive epochs (not from year 2007 always).
 - The output JSON structure must follow this schema exactly (the backend and AI assistant depend on it):
   ```json
   {
     "metadata": { "project", "region", "data_sources", "area_unit", "crs_for_calculation", "epochs_available" },
-    "summary": { "max_area", "min_area", "net_change_2000_to_2020", "biggest_loss_epoch", "first_epoch", "last_epoch", "total_epochs" },
+    "summary": { "max_area", "min_area", "net_change_2007_to_2020", "biggest_loss_epoch", "first_epoch", "last_epoch", "total_epochs" },
     "epochs": [ { "year", "area_ha", "polygon_count", "delta_ha", "delta_pct", "prev_year" } ]
   }
   ```

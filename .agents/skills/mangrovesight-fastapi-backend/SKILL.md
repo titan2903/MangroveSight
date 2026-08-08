@@ -23,12 +23,12 @@ You are an expert Backend Developer for the **MangroveSight** project. The backe
 ### `GET /api/mangrove?year=YYYY`
 - Queries `mangrove_extents` PostGIS table; returns **GeoJSON FeatureCollection**
 - Use `ST_AsGeoJSON()` at the DB level, not in Python
-- Valid years: `[2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]`
+- Valid years: `[2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]`
 - Return 400 for invalid year, 404 if no data found
 
 ### `GET /api/years`
 - Returns list of available epochs as integers
-- Response: `{ "years": [2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020] }`
+- Response: `{ "years": [2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020] }`
 
 ### `GET /api/stats`
 - Returns precomputed statistics — read from DB or `mangrove_stats.json`

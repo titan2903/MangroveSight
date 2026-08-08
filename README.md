@@ -1,8 +1,8 @@
 # MangroveSight
 
-## WebGIS Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan (2000–2020)
+## WebGIS Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan (2007–2020)
 
-MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari Final Project Bootcamp WebGIS Batch 3 MAPID Academy. Proyek ini bertujuan untuk memvisualisasikan perubahan sebaran hutan mangrove di wilayah Teluk Balikpapan dari periode 2000 hingga 2020 secara interaktif dan mudah dipahami.
+MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari Final Project Bootcamp WebGIS Batch 3 MAPID Academy. Proyek ini bertujuan untuk memvisualisasikan perubahan sebaran hutan mangrove di wilayah Teluk Balikpapan dari periode 2007 hingga 2020 secara interaktif dan mudah dipahami.
 
 ### Tujuan Proyek
 - Menyajikan data spasial mangrove dalam bentuk peta interaktif.

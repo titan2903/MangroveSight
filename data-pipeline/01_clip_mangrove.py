@@ -2,14 +2,12 @@
 Script 01: Clip Mangrove Shapefiles to Teluk Balikpapan Bounding Box
 ===================================================================
 Sumber Data:
-  - GMW v4.0 (Epoch 2000): https://zenodo.org/records/12756047
   - GMW v3.0 (Epoch 2007-2020): https://zenodo.org/records/6894273
 
 Cara Penggunaan:
   1. Unduh file shapefile dari link di atas.
   2. Letakkan file-file tersebut di dalam folder: data-pipeline/input/
   3. Pastikan naming convention:
-       - GMW v4.0 tahun 2000 → input/GMW_v4_2000.shp  (atau nama asli dari Zenodo)
        - GMW v3.0 per tahun  → input/GMW_v3_YYYY.shp
   4. Jalankan script ini:
        cd data-pipeline
@@ -17,7 +15,7 @@ Cara Penggunaan:
 
 Output:
   File GeoJSON hasil clip tersimpan di folder: data-pipeline/output/clipped/
-  Contoh: output/clipped/mangrove_2000.geojson
+  Contoh: output/clipped/mangrove_2007.geojson
 """
 
 import geopandas as gpd
@@ -35,7 +33,6 @@ BALIKPAPAN_BBOX = (116.60, -1.55, 117.15, -1.00)
 # Sesuaikan nama file di sini jika nama file download dari Zenodo berbeda.
 # =============================================================================
 EPOCH_FILE_MAPPING = {
-    2000: "GMW_v4_2000.shp",
     2007: "GMW_v3_2007.shp",
     2008: "GMW_v3_2008.shp",
     2009: "GMW_v3_2009.shp",

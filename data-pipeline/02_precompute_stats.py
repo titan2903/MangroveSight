@@ -37,7 +37,7 @@ OUTPUT_FILE = STATS_DIR / "mangrove_stats.json"
 UTM_CRS = "EPSG:32750"
 
 # Daftar epoch yang diharapkan, sesuai PRD
-EXPECTED_EPOCHS = [2000, 2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]
+EXPECTED_EPOCHS = [2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]
 
 
 def calculate_area_ha(gdf: gpd.GeoDataFrame) -> float:
@@ -148,7 +148,7 @@ def main():
             "year": min_year,
             "area_ha": epoch_data[min_year]["area_ha"],
         },
-        "net_change_2000_to_2020": {
+        "net_change_2007_to_2020": {
             "delta_ha": net_change_ha,
             "delta_pct": net_change_pct,
         },
@@ -167,7 +167,6 @@ def main():
             "project": "MangroveSight",
             "region": "Teluk Balikpapan",
             "data_sources": {
-                "2000": "Global Mangrove Watch v4.0 (Zenodo: 10.5281/zenodo.12756047)",
                 "2007_2020": "Global Mangrove Watch v3.0 (Zenodo: 10.5281/zenodo.6894273)",
             },
             "area_unit": "hectares (ha)",

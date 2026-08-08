@@ -86,7 +86,7 @@ graph TD
 ### 2.3. Database (Spatial & Stats)
 
 - **Tech Stack**: PostgreSQL with PostGIS extension.
-- **Responsibility**: Stores the clipped spatial data of mangrove extents (2000-2020) and the precomputed statistical data.
+- **Responsibility**: Stores the clipped spatial data of mangrove extents (2007-2020) and the precomputed statistical data.
 - **Hosting**: Heroku Postgres (Add-on).
 
 ### 2.4. Data Pipeline (Offline Preprocessing)

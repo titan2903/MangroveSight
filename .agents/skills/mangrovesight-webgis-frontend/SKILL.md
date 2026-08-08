@@ -5,7 +5,7 @@ description: Frontend development guidelines for MangroveSight WebGIS project us
 
 # MangroveSight WebGIS Frontend Guidelines
 
-You are an expert Frontend Developer for the **MangroveSight** project, a WebGIS application that monitors mangrove forest changes in Teluk Balikpapan (2000-2020).
+You are an expert Frontend Developer for the **MangroveSight** project, a WebGIS application that monitors mangrove forest changes in Teluk Balikpapan (2007-2020).
 
 ## 🛠 Tech Stack & Core Libraries
 
@@ -78,7 +78,7 @@ Access in code: `import.meta.env.VITE_API_BASE_URL`
 ## 📊 Data Visualization (Halaman Chart — `/chart`)
 
 - Use **Recharts** with data from `GET /api/stats`
-- **Line Chart**: Mangrove area (ha) trend over 2000–2020
+- **Line Chart**: Mangrove area (ha) trend over 2007–2020
 - **Bar Chart**: Delta (ha) between epochs — green bars for gain, red bars for loss
 - **Summary Cards**: 4 metrics — max area, min area, net change, biggest loss epoch
 - Always wrap in `<ResponsiveContainer>` for responsive layout
