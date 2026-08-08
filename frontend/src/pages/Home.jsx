@@ -243,6 +243,30 @@ const Home = () => {
         </Container>
       </Box>
 
+      {/* 4. Modern Footer */}
+      <Box sx={{ bgcolor: '#00251a', color: 'rgba(255, 255, 255, 0.7)', py: 6, mt: 'auto' }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center" justifyContent="space-between">
+            <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography variant="h6" sx={{ color: '#00BFA5', fontWeight: 800, mb: 1 }}>
+                MangroveSight
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Sistem Informasi Geografis & Change Detection Deforestasi Mangrove Teluk Balikpapan (2007-2020)
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'center', md: 'right' } }}>
+              <Typography variant="body2">
+                &copy; {new Date().getFullYear()} MangroveSight Project. All rights reserved.
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1, opacity: 0.6 }}>
+                Diberdayakan oleh React, Leaflet, & Google Gemini AI
+              </Typography>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
       {/* Global CSS animation for Pulse */}
       <style>
         {`
