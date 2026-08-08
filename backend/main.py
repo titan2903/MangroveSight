@@ -3,10 +3,36 @@ from fastapi.middleware.cors import CORSMiddleware
 from settings import settings
 from routers import mangrove, stats, ai
 
+tags_metadata = [
+    {
+        "name": "Mangrove",
+        "description": "Endpoint untuk mengambil data spasial GeoJSON hutan mangrove (2007-2020).",
+    },
+    {
+        "name": "Statistics",
+        "description": "Endpoint untuk mengambil ringkasan statistik (luas area dan delta perubahan) yang sudah di-precompute.",
+    },
+    {
+        "name": "AI",
+        "description": "Endpoint integrasi Gemini untuk AI Assistant khusus MangroveSight.",
+    },
+    {
+        "name": "Health",
+        "description": "Endpoint untuk mengecek status kesehatan API.",
+    },
+]
+
 app = FastAPI(
     title="MangroveSight API",
-    description="Backend API for MangroveSight (Teluk Balikpapan)",
-    version="1.0.0"
+    description="""
+**Backend API untuk MangroveSight WebGIS.**
+API ini menyediakan data spasial dan statistik terkait perubahan hutan mangrove di Teluk Balikpapan (2007-2020),
+serta asisten AI yang dapat menjawab pertanyaan seputar data tersebut.
+""",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=tags_metadata
 )
 
 app.add_middleware(
@@ -21,6 +47,12 @@ app.include_router(mangrove.router, prefix="/api/mangrove", tags=["Mangrove"])
 app.include_router(stats.router, prefix="/api/stats", tags=["Statistics"])
 app.include_router(ai.router, prefix="/api/ask", tags=["AI"])
 
-@app.get("/")
-def root():
-    return {"message": "Welcome to MangroveSight API"}
+@app.get("/", tags=["Health"])
+def health_check():
+    """
+    Endpoint untuk mengecek status kesehatan API (Health Check).
+    """
+    return {
+        "status": "ok", 
+        "message": "MangroveSight API is healthy and running smoothly."
+    }

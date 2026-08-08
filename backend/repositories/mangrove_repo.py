@@ -6,8 +6,8 @@ def get_mangrove_geojson_from_db(year: int, db: Session) -> Any:
     query = text("""
         SELECT jsonb_build_object(
             'type',     'FeatureCollection',
-            'features', jsonb_agg(features.feature)
-        )
+            'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+        )::text
         FROM (
           SELECT jsonb_build_object(
             'type',       'Feature',
