@@ -1,128 +1,258 @@
 import React from 'react';
-import { Box, Typography, Container, Grid, Card, CardMedia, CardContent, Paper, Divider, Button } from '@mui/material';
+import { Box, Typography, Container, Grid, Card, CardMedia, CardContent, Paper, Button } from '@mui/material';
+import { motion } from 'framer-motion';
+import { Map, TrendingUp, Cpu, ChevronDown, Activity } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Import images
-import img1 from '../images/mangrove-teluk-balikpapan-IMG_0595-1200x800.jpg';
+import img1 from '../images/mangrove-sea.jpg';
 import img2 from '../images/Pembukan-mangrove-pt-MMP-Pokja-Pesisir2.jpg';
-import img3 from '../images/hutan_mangrove.jpeg';
+import img3 from '../images/mangrove.jpeg';
+
+// Animation variants
+const fadeUp = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
 
 const Home = () => {
   return (
-    <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', bgcolor: '#f5f5f5', pb: 8 }}>
-      
-      {/* Hero Section */}
-      <Box 
-        sx={{ 
-          width: '100%', 
-          height: '400px', 
-          backgroundImage: `linear-gradient(rgba(0, 77, 64, 0.7), rgba(0, 77, 64, 0.7)), url(${img1})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+    <Box sx={{ width: '100%', minHeight: '100vh', bgcolor: '#f4f6f8', overflowX: 'hidden' }}>
+
+      {/* 1. Cinematic Hero Section */}
+      <Box
+        sx={{
+          width: '100%',
+          height: '100vh',
+          position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'white',
           textAlign: 'center',
-          px: 3
+          overflow: 'hidden'
         }}
       >
-        <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2, textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-          MangroveSight
-        </Typography>
-        <Typography variant="h5" sx={{ maxWidth: '800px', opacity: 0.9 }}>
-          Memantau Dinamika Perubahan Tutupan Lahan Hutan Mangrove di Teluk Balikpapan (2007 - 2020)
-        </Typography>
+        {/* Background Image with Parallax-like scale */}
+        <motion.div
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundImage: `url(${img1})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 0
+          }}
+        />
+        {/* Deep Gradient Overlay */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'linear-gradient(to bottom, rgba(0, 30, 20, 0.4) 0%, rgba(0, 77, 64, 0.85) 100%)',
+          zIndex: 1
+        }} />
+
+        {/* Hero Content */}
+        <Box sx={{ position: 'relative', zIndex: 2, px: 3, maxWidth: '1000px' }}>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <Typography variant="h1" sx={{
+              fontWeight: 900,
+              mb: 2,
+              fontSize: { xs: '3.5rem', md: '5.5rem' },
+              background: 'linear-gradient(45deg, #A7FFEB, #00BFA5)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0px 10px 30px rgba(0,0,0,0.3)'
+            }}>
+              MangroveSight
+            </Typography>
+            <Typography variant="h5" sx={{ mb: 5, fontWeight: 300, lineHeight: 1.6, opacity: 0.95, textShadow: '0px 2px 4px rgba(0,0,0,0.5)' }}>
+              Eksplorasi Dinamika Spasial & Perubahan Ekologis Hutan Mangrove Teluk Balikpapan (2007 - 2020)
+            </Typography>
+
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                component={Link}
+                to="/maps"
+                variant="contained"
+                size="large"
+                sx={{
+                  bgcolor: '#00BFA5',
+                  color: '#fff',
+                  px: { xs: 4, md: 6 },
+                  py: { xs: 1.5, md: 2 },
+                  fontSize: '1.2rem',
+                  borderRadius: '50px',
+                  textTransform: 'none',
+                  fontWeight: 'bold',
+                  boxShadow: '0 8px 32px rgba(0, 191, 165, 0.5)',
+                  '&:hover': { bgcolor: '#004D40' },
+                  animation: 'pulse 2s infinite'
+                }}
+              >
+                Jelajahi Peta Spasial
+              </Button>
+            </motion.div>
+          </motion.div>
+        </Box>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          animate={{ y: [0, 15, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          style={{ position: 'absolute', bottom: '40px', zIndex: 2 }}
+        >
+          <ChevronDown size={40} opacity={0.7} />
+        </motion.div>
       </Box>
 
-      {/* Main Content */}
-      <Container maxWidth="lg" sx={{ mt: -6 }}>
-        <Paper elevation={3} sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, bgcolor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
-          
-          <Grid container spacing={6}>
-            <Grid size={{ xs: 12, md: 7 }}>
-              <Typography variant="h4" sx={{ color: '#004D40', fontWeight: 'bold', mb: 3 }}>
-                Hutan Mangrove Teluk Balikpapan
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2, fontSize: '1.1rem', lineHeight: 1.8, color: 'text.secondary' }}>
-                Teluk Balikpapan merupakan salah satu kawasan perairan yang kaya akan keanekaragaman hayati di Kalimantan Timur. 
-                Ekosistem mangrove di kawasan ini memiliki peranan sangat vital dalam menjaga kestabilan garis pantai, menahan abrasi, serta menjadi habitat penting bagi berbagai spesies endemik seperti Bekantan (<i>Nasalis larvatus</i>).
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2, fontSize: '1.1rem', lineHeight: 1.8, color: 'text.secondary' }}>
-                Namun, seiring dengan pesatnya pembangunan infrastruktur dan pembukaan lahan industri, keberadaan hutan mangrove di Teluk Balikpapan semakin terancam.
-                Deforestasi lahan basah ini memicu kekhawatiran terkait dampak lingkungan jangka panjang.
-              </Typography>
-              <Typography variant="body1" sx={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'text.secondary' }}>
-                Melalui <b>MangroveSight</b>, kami menyajikan platform WebGIS cerdas yang mengintegrasikan data spasial multi-temporal (2007 hingga 2020) dengan AI. 
-                Tujuannya adalah untuk mempermudah para peneliti, pemerintah, maupun masyarakat umum dalam mengamati, menganalisis, dan mengambil keputusan berbasis data terkait konservasi mangrove.
-              </Typography>
+      {/* 2. Features & Context Section */}
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 }, position: 'relative', zIndex: 3 }}>
+        
+        {/* Text Section (Full width, centered) */}
+        <Box sx={{ mb: 8, textAlign: 'center' }}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
+            <Typography variant="h3" sx={{ color: '#004D40', fontWeight: 800, mb: 3 }}>
+              Mengapa Teluk Balikpapan?
+            </Typography>
+            <Typography variant="body1" sx={{ fontSize: '1.15rem', lineHeight: 1.8, color: '#455a64', mb: 2, maxWidth: '900px', mx: 'auto' }}>
+              Teluk Balikpapan adalah surga keanekaragaman hayati yang menopang kehidupan satwa endemik seperti Bekantan. Namun, pesatnya industrialisasi menempatkan kawasan esensial ini di bawah ancaman deforestasi kritis.
+            </Typography>
+            <Typography variant="body1" sx={{ fontSize: '1.15rem', lineHeight: 1.8, color: '#455a64', maxWidth: '900px', mx: 'auto' }}>
+              MangroveSight mengombinasikan kecerdasan spasial (GIS) dan analitik tingkat lanjut untuk memberikan visualisasi komprehensif tentang penyusutan dan pertumbuhan ekosistem lahan basah ini.
+            </Typography>
+          </motion.div>
+        </Box>
+
+        {/* Cards Section (2 cards per row) */}
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 4 }}>
+
+            {/* Feature 1 */}
+            <Box>
+              <motion.div variants={fadeUp} whileHover={{ y: -8 }} style={{ height: '100%' }}>
+                <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid #e0f2f1', boxShadow: '0 10px 40px rgba(0,77,64,0.05)', height: '100%' }}>
+                  <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: '#e0f2f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00BFA5', mb: 2 }}>
+                    <Map size={28} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>Change Detection</Typography>
+                  <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Analisis poligon otomatis untuk melacak area yang hilang, tumbuh, atau stabil (2007-2020).</Typography>
+                </Paper>
+              </motion.div>
+            </Box>
+
+            {/* Feature 2 */}
+            <Box>
+              <motion.div variants={fadeUp} whileHover={{ y: -8 }} style={{ height: '100%' }}>
+                <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid #e0f2f1', boxShadow: '0 10px 40px rgba(0,77,64,0.05)', height: '100%' }}>
+                  <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: '#fff3e0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f57c00', mb: 2 }}>
+                    <Activity size={28} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>Heatmap Kepadatan</Typography>
+                  <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Visualisasi konsentrasi area mangrove secara termal dengan rendering canvas performa tinggi.</Typography>
+                </Paper>
+              </motion.div>
+            </Box>
+
+            {/* Feature 3 */}
+            <Box>
+              <motion.div variants={fadeUp} whileHover={{ y: -8 }} style={{ height: '100%' }}>
+                <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid #e0f2f1', boxShadow: '0 10px 40px rgba(0,77,64,0.05)', height: '100%' }}>
+                  <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: '#e8eaf6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f51b5', mb: 2 }}>
+                    <TrendingUp size={28} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>Statistik Panel</Typography>
+                  <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Dashboard grafik analitik untuk melihat tren total luas area secara kuantitatif & instan.</Typography>
+                </Paper>
+              </motion.div>
+            </Box>
+
+            {/* Feature 4 */}
+            <Box>
+              <motion.div variants={fadeUp} whileHover={{ y: -8 }} style={{ height: '100%' }}>
+                <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid #e0f2f1', boxShadow: '0 10px 40px rgba(0,77,64,0.05)', height: '100%' }}>
+                  <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: '#fce4ec', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e91e63', mb: 2 }}>
+                    <Cpu size={28} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>Gemini AI Assistant</Typography>
+                  <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Chatbot integratif yang disuplai dengan konteks statistik untuk menjawab pertanyaan geospasial Anda.</Typography>
+                </Paper>
+              </motion.div>
+            </Box>
+
+          </Box>
+        </motion.div>
+      </Container>
+
+      {/* 3. Media Gallery / Context Showcase */}
+      <Box sx={{ bgcolor: '#ffffff', py: 10 }}>
+        <Container maxWidth="lg">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <Typography variant="h4" sx={{ textAlign: 'center', color: '#004D40', fontWeight: 800, mb: 6 }}>
+              Ancaman Nyata, Solusi Berbasis Data
+            </Typography>
+          </motion.div>
+
+          <Grid container spacing={5}>
+            <Grid item xs={12} md={6}>
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ scale: 1.02 }} style={{ height: '100%' }}>
+                <Card sx={{ borderRadius: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.08)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Box sx={{ overflow: 'hidden' }}>
+                    <CardMedia component="img" height="320" image={img3} alt="Hutan Mangrove" sx={{ transition: 'transform 0.5s', '&:hover': { transform: 'scale(1.1)' } }} />
+                  </Box>
+                  <CardContent sx={{ bgcolor: '#004D40', color: 'white', flexGrow: 1, p: { xs: 3, md: 5 } }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>Ekosistem Lahan Basah</Typography>
+                    <Typography variant="body1" sx={{ opacity: 0.85, lineHeight: 1.7 }}>
+                      Benteng alami pesisir Balikpapan yang menyimpan cadangan karbon tinggi dan melindungi lingkungan dari abrasi laut yang destruktif.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Card sx={{ borderRadius: 3, boxShadow: 4, mb: 4 }}>
-                <CardMedia
-                  component="img"
-                  height="250"
-                  image={img3}
-                  alt="Hutan Mangrove"
-                />
-                <CardContent sx={{ bgcolor: '#004D40', color: 'white' }}>
-                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                    Kawasan ekosistem lahan basah Teluk Balikpapan.
-                  </Typography>
-                </CardContent>
-              </Card>
-              
-              <Card sx={{ borderRadius: 3, boxShadow: 4 }}>
-                <CardMedia
-                  component="img"
-                  height="220"
-                  image={img2}
-                  alt="Kerusakan Mangrove"
-                />
-                <CardContent sx={{ bgcolor: '#C62828', color: 'white' }}>
-                  <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                    Ancaman deforestasi dan alih fungsi lahan.
-                  </Typography>
-                </CardContent>
-              </Card>
+            <Grid item xs={12} md={6}>
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ scale: 1.02 }} style={{ height: '100%' }}>
+                <Card sx={{ borderRadius: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.08)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Box sx={{ overflow: 'hidden' }}>
+                    <CardMedia component="img" height="320" image={img2} alt="Kerusakan Mangrove" sx={{ transition: 'transform 0.5s', '&:hover': { transform: 'scale(1.1)' } }} />
+                  </Box>
+                  <CardContent sx={{ bgcolor: '#C62828', color: 'white', flexGrow: 1, p: { xs: 3, md: 5 } }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>Deforestasi Industri</Typography>
+                    <Typography variant="body1" sx={{ opacity: 0.85, lineHeight: 1.7 }}>
+                      Pembukaan lahan masif yang mengancam keberlanjutan wilayah. MangroveSight hadir untuk memantau perubahan ini secara transparan.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
           </Grid>
-          
-          <Divider sx={{ my: 6 }} />
+        </Container>
+      </Box>
 
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h5" sx={{ color: '#004D40', fontWeight: 'bold', mb: 2 }}>
-              Jelajahi Peta Spasial Kami
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary', maxWidth: '600px', mx: 'auto' }}>
-              Lihat secara langsung bagaimana luas mangrove berubah dari tahun ke tahun melalui peta interaktif kami.
-            </Typography>
-            <Button 
-              href="/maps"
-              variant="contained" 
-              size="large"
-              sx={{ 
-                bgcolor: '#00BFA5', 
-                color: '#fff',
-                px: 4, 
-                py: 1.5, 
-                fontSize: '1.1rem',
-                borderRadius: 8,
-                textTransform: 'none',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 14px 0 rgba(0, 191, 165, 0.39)',
-                '&:hover': {
-                  bgcolor: '#004D40'
-                }
-              }}
-            >
-              Buka WebGIS MangroveSight
-            </Button>
-          </Box>
-          
-        </Paper>
-      </Container>
+      {/* Global CSS animation for Pulse */}
+      <style>
+        {`
+          @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 191, 165, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 191, 165, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 191, 165, 0); }
+          }
+        `}
+      </style>
     </Box>
   );
 };
