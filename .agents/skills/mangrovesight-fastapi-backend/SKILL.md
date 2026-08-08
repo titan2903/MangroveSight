@@ -63,14 +63,18 @@ You are an expert Backend Developer for the **MangroveSight** project. The backe
 - **Stateless**: Single-turn Q&A only — no session memory
 - **Error Handling**: Wrap Gemini calls in `try-except` for rate limits and timeouts
 
-## 🗄️ Database (PostGIS) Rules
+### `GET /`
+- Health check endpoint returning `{"status": "ok", "message": "..."}`
+
+## 🗄️ Database (PostGIS) Rules & Performance
 
 - **Connection**: Load `DATABASE_URL` via `pydantic-settings`. Fix Heroku's deprecated prefix: `url.replace("postgres://", "postgresql://", 1)`
 - **Table schema**: `mangrove_extents` with columns `year INTEGER`, `geometry GEOMETRY(Geometry, 4326)`
 - **Spatial Index**: Table has GIST on `geometry` and B-tree on `year` — leverage these in WHERE clauses
+- **Performance Optimization**: When returning massive GeoJSON FeatureCollections, use `::text` in the PostgreSQL query (e.g. `COALESCE(jsonb_agg(...), '[]'::jsonb)::text`) and return it directly using FastAPI's `Response(content=json_str, media_type="application/json")`. Do NOT let Pydantic parse and serialize massive GeoJSON dictionaries.
 - **Alembic**: Use `alembic revision --autogenerate` for schema changes; never use `Base.metadata.create_all()` in production
 
-## 📁 Recommended File Structure
+## 📁 Recommended File Structure (Clean Architecture)
 
 ```
 backend/
@@ -78,10 +82,16 @@ backend/
 ├── db.py                # SQLAlchemy engine + session dependency
 ├── settings.py          # pydantic-settings Settings class
 ├── schemas.py           # Pydantic response models
-├── routers/
+├── routers/             # API Endpoints (receives HTTP requests)
 │   ├── mangrove.py      # GET /api/mangrove
 │   ├── stats.py         # GET /api/stats, GET /api/years
 │   └── ai.py            # POST /api/ask
+├── services/            # Business Logic
+│   ├── mangrove_service.py
+│   ├── stats_service.py
+│   └── ai_service.py
+├── repositories/        # Database Queries
+│   └── mangrove_repo.py
 ├── requirements.txt
 ├── Procfile             # web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}
 └── .env                 # LOCAL ONLY — never commit
