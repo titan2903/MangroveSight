@@ -10,3 +10,6 @@ psycopg2-binary
 # Spatial / GIS
 GeoAlchemy2
 shapely
+
+# AI Integration
+google-genai
