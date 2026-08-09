@@ -221,7 +221,7 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         </Box>
       </Fade>
 
-      {/* ── Gradient Legend ──────────────────────────────── */}
+      {/* ── Gradient Legends ──────────────────────────────── */}
       <Box sx={{
         position: 'absolute',
         bottom: 110,
@@ -234,16 +234,36 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         minWidth: 150,
       }}>
-        <Typography variant="caption" sx={{ fontWeight: 700, color: '#004D40', display: 'block', mb: 0.5 }}>
-          🌿 Tutupan Mangrove
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box sx={{ width: 100, height: 10, borderRadius: 5, background: 'linear-gradient(90deg, rgba(0,191,165,0.2), rgba(0,191,165,1))' }} />
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.3 }}>
-          <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Jarang</Typography>
-          <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Padat</Typography>
-        </Box>
+        {heatmapData ? (
+          <>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: '#004D40', display: 'block', mb: 0.5 }}>
+              🔥 Kepadatan Mangrove
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ 
+                width: 120, height: 10, borderRadius: 5, 
+                background: 'linear-gradient(90deg, #0d47a1 0%, #0288d1 30%, #00bfa5 50%, #f9a825 70%, #e53935 90%, #b71c1c 100%)' 
+              }} />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.3 }}>
+              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Rendah</Typography>
+              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Tinggi</Typography>
+            </Box>
+          </>
+        ) : (
+          <>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: '#004D40', display: 'block', mb: 0.5 }}>
+              🌿 Tutupan Mangrove
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: 100, height: 10, borderRadius: 5, background: 'linear-gradient(90deg, rgba(0,191,165,0.2), rgba(0,191,165,1))' }} />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.3 }}>
+              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Jarang</Typography>
+              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Padat</Typography>
+            </Box>
+          </>
+        )}
         {year && (
           <Chip
             label={`${year}`}
