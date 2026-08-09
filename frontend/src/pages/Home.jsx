@@ -3,6 +3,9 @@ import { Box, Typography, Container, Grid, Card, CardMedia, CardContent, Paper, 
 import { motion } from 'framer-motion';
 import { Map, TrendingUp, Cpu, ChevronDown, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import EmailIcon from '@mui/icons-material/Email';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 // Import images
 import img1 from '../images/mangrove-sea.jpg';
@@ -208,7 +211,7 @@ const Home = () => {
           </motion.div>
 
           <Grid container spacing={5}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ scale: 1.02 }} style={{ height: '100%' }}>
                 <Card sx={{ borderRadius: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.08)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ overflow: 'hidden' }}>
@@ -224,7 +227,7 @@ const Home = () => {
               </motion.div>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ scale: 1.02 }} style={{ height: '100%' }}>
                 <Card sx={{ borderRadius: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.08)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ overflow: 'hidden' }}>
@@ -244,22 +247,51 @@ const Home = () => {
       </Box>
 
       {/* 4. Modern Footer */}
-      <Box sx={{ bgcolor: '#00251a', color: 'rgba(255, 255, 255, 0.7)', py: 6, mt: 'auto' }}>
+      <Box sx={{ bgcolor: '#004D40', color: 'rgba(255, 255, 255, 0.8)', py: 6, mt: 'auto' }}>
         <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center" justifyContent="space-between">
-            <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+          <Grid container spacing={4} sx={{ justifyContent: 'space-between' }}>
+            {/* Column 1: Project Info */}
+            <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               <Typography variant="h6" sx={{ color: '#00BFA5', fontWeight: 800, mb: 1 }}>
                 MangroveSight
               </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 2, opacity: 0.8 }}>
                 Sistem Informasi Geografis & Change Detection Deforestasi Mangrove Teluk Balikpapan (2007-2020)
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'center', md: 'right' } }}>
-              <Typography variant="body2">
-                &copy; {new Date().getFullYear()} MangroveSight Project. All rights reserved.
+
+            {/* Column 2: Contact */}
+            <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, mb: 2, fontSize: '1rem' }}>
+                Hubungi Saya
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1, opacity: 0.6 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 1, gap: 1.5 }}>
+                <InstagramIcon sx={{ fontSize: 18, color: '#00BFA5' }} />
+                <Typography component="a" href="https://instagram.com/titann.io" target="_blank" rel="noopener noreferrer" variant="body2" sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#00BFA5' } }}>
+                  @titann.io
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 1, gap: 1.5 }}>
+                <EmailIcon sx={{ fontSize: 18, color: '#00BFA5' }} />
+                <Typography component="a" href="mailto:titanioyudista29@gmail.com" variant="body2" sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#00BFA5' } }}>
+                  titanioyudista29@gmail.com
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 1.5 }}>
+                <GitHubIcon sx={{ fontSize: 18, color: '#00BFA5' }} />
+                <Typography component="a" href="https://github.com/titan2903/MangroveSight" target="_blank" rel="noopener noreferrer" variant="body2" sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: '#00BFA5' } }}>
+                  Source Code Repository
+                </Typography>
+              </Box>
+            </Grid>
+
+            {/* Column 3: Copyright */}
+            <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: { xs: 'center', md: 'right' }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                &copy; {new Date().getFullYear()} MangroveSight Project.
+                <br/>All rights reserved.
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 2, opacity: 0.6, fontSize: '0.8rem' }}>
                 Diberdayakan oleh React, Leaflet, & Google Gemini AI
               </Typography>
             </Grid>
