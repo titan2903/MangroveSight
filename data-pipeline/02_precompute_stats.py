@@ -177,8 +177,15 @@ def main():
         "epochs": list(epoch_data.values()),
     }
 
-    # Tulis ke file JSON
+    # Tulis ke file JSON di data-pipeline (untuk lokal)
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(output_json, f, indent=2, ensure_ascii=False)
+
+    # Tulis salinan ke backend/data/mangrove_stats.json (untuk di-deploy ke Heroku)
+    backend_data_dir = Path(__file__).parent.parent / "backend" / "data"
+    backend_data_dir.mkdir(parents=True, exist_ok=True)
+    backend_output_file = backend_data_dir / "mangrove_stats.json"
+    with open(backend_output_file, "w", encoding="utf-8") as f:
         json.dump(output_json, f, indent=2, ensure_ascii=False)
 
     print("\n" + "=" * 60)
