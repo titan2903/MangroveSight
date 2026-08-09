@@ -10,7 +10,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 // Import images
 import img1 from '../images/mangrove-sea.jpg';
 import img2 from '../images/Pembukan-mangrove-pt-MMP-Pokja-Pesisir2.jpg';
-import img3 from '../images/mangrove.jpeg';
+import img3 from '../images/bentang-mangrove.jpeg';
 
 // Animation variants
 const fadeUp = {
@@ -125,7 +125,7 @@ const Home = () => {
 
       {/* 2. Features & Context Section */}
       <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 }, position: 'relative', zIndex: 3 }}>
-        
+
         {/* Text Section (Full width, centered) */}
         <Box sx={{ mb: 8, textAlign: 'center' }}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
@@ -289,7 +289,7 @@ const Home = () => {
             <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: { xs: 'center', md: 'right' }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>
                 &copy; {new Date().getFullYear()} MangroveSight Project.
-                <br/>All rights reserved.
+                <br />All rights reserved.
               </Typography>
               <Typography variant="body2" sx={{ mt: 2, opacity: 0.6, fontSize: '0.8rem' }}>
                 Diberdayakan oleh React, Leaflet, & Google Gemini AI
