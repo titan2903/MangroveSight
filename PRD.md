@@ -122,7 +122,7 @@ Teluk Balikpapan mengalami degradasi ekosistem mangrove akibat tekanan industri 
 
 - **Cara Kerja (Arsitektur Sederhana):**
   1. Saat preprocessing data, buat **ringkasan statistik terstruktur** (JSON) berisi: luas per epoch, delta antar-epoch, top loss/gain area, dsb.
-  2. Ringkasan ini di-inject sebagai **context/system prompt** ke LLM API (Gemini API) — bukan pencarian real-time ke database spasial.
+  2. Ringkasan ini di-inject sebagai **context/system prompt** ke LLM API (OpenRouter AI) — bukan pencarian real-time ke database spasial.
   3. Frontend mengirim pertanyaan user + context JSON ke backend endpoint (`/api/ask`) → backend forward ke LLM API → jawab dalam bahasa natural.
   4. Tidak ada vector database, tidak ada RAG kompleks, tidak ada fine-tuning — murni **prompt engineering + structured context**.
 
@@ -165,7 +165,7 @@ Backend       : FastAPI (Python)
                 - GET /api/mangrove?year=YYYY     → GeoJSON layer per epoch
                 - GET /api/stats                  → statistik precomputed (JSON)
                 - GET /api/years                  → list epoch yang tersedia
-                - POST /api/ask                   → proxy ke Gemini API
+                - POST /api/ask                   → proxy ke OpenRouter AI
 
 Database      : PostgreSQL + PostGIS
                 → Di-host di Heroku Postgres (Heroku add-on)
@@ -177,7 +177,7 @@ Frontend      : Vite + React JS
                 - Recharts untuk grafik di halaman Chart
                 - Turf.js untuk kalkulasi/validasi luas sisi client (opsional)
 
-AI Layer      : Gemini API (Gemini Flash 2.0)
+AI Layer      : OpenRouter AI (Free Model)
                 - Dipanggil via backend endpoint /api/ask
                 - API key disimpan sebagai environment variable Heroku
                 - Tidak pernah diekspos ke frontend
@@ -202,7 +202,7 @@ CI/CD         : GitHub Actions
   Environment :
                 - HEROKU_API_KEY → GitHub Secret
                 - NETLIFY_AUTH_TOKEN + NETLIFY_SITE_ID → GitHub Secret
-                - GEMINI_API_KEY → Heroku Config Vars (tidak masuk repo)
+                - OPENROUTER_API_KEY → Heroku Config Vars (tidak masuk repo)
 ```
 
 ### Struktur Repository
@@ -252,7 +252,7 @@ mangrove-sight/
 |---|---|---|
 | **1** | Data Pipeline + Backend + CI/CD Setup | Data GMW (2007–2020) ter-clip & masuk PostGIS Heroku; semua endpoint FastAPI jalan; GitHub Actions pipeline terkonfigurasi (auto-deploy sudah aktif) |
 | **2** | Frontend Core — Navbar, Maps, About (F0, F1, F4, F5) | SPA dengan React Router; halaman About statis; peta Leaflet dengan epoch slider/dropdown; info panel & legend; auto-deploy ke Netlify via push ke `master` |
-| **3** | Chart, Analisis & AI (F2, F2b, F3, F6) | Halaman Chart dengan line + bar chart (Recharts); kalkulasi luas; change detection overlay; chat widget AI terhubung ke Gemini API |
+| **3** | Chart, Analisis & AI (F2, F2b, F3, F6) | Halaman Chart dengan line + bar chart (Recharts); kalkulasi luas; change detection overlay; chat widget AI terhubung ke OpenRouter AI |
 | **4** | Polish, F7 (opsional), Finalisasi | Styling konsisten antar halaman; testing end-to-end; validasi CI/CD pipeline; dokumentasi README; slide presentasi |
 
 ### Catatan Prioritas Minggu 1
@@ -275,7 +275,7 @@ Setup CI/CD di awal (bukan di akhir) adalah keputusan krusial — setelah pipeli
 | Perbedaan format data GMW v3.0 | Inkonsistensi visualisasi | Seragamkan proyeksi (EPSG:4326) dan format saat import ke PostGIS |
 | GitHub Actions gagal deploy (misconfigured secrets) | Delay pipeline | Uji pipeline CI/CD di Minggu 1 dengan dummy endpoint sebelum data siap |
 | CORS error antara Netlify frontend dan Heroku backend | Fitur tidak berjalan di production | Konfigurasikan CORS di FastAPI dari awal (`origins=["https://your-netlify-url"]`) |
-| Biaya API LLM membengkak jika trafik tinggi | Biaya tak terduga | Set rate limit di endpoint `/api/ask`; gunakan `Gemini Flash 2.0` (lebih murah) untuk chat sederhana |
+| Biaya API LLM membengkak jika trafik tinggi | Biaya tak terduga | Set rate limit di endpoint `/api/ask`; gunakan `OpenRouter AI` (gratis) untuk chat sederhana |
 | AI menjawab di luar konteks (halusinasi angka) | Kredibilitas project turun | Inject data precomputed sebagai context; instruksikan system prompt agar hanya menjawab dari data yang diberikan |
 | Data GMW resolusi 25–30m kurang presisi di skala lokal | Akurasi analisis terbatas | Cantumkan sebagai limitasi eksplisit di halaman About dan laporan project |
 

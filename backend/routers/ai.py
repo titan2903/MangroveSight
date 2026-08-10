@@ -27,7 +27,7 @@ def check_rate_limit(req: Request):
 @router.post("/", dependencies=[Depends(check_rate_limit)])
 def ask_ai(request: AskRequest):
     """
-    Endpoint AI Chat Assistant (Gemini).
+    Endpoint AI Chat Assistant (OpenRouter AI).
     Menggunakan context precomputed stats dan memiliki guardrails ketat
     agar hanya menjawab pertanyaan terkait MangroveSight.
     """

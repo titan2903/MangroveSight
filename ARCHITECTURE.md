@@ -10,7 +10,7 @@ The system follows a modern decoupled architecture (Client-Server model) with a 
 graph TD
     %% User and External Services
     User["Web Browser / User"]
-    Gemini["Gemini API - Flash 2.0"]
+    OpenRouter["OpenRouter AI"]
     OSM["OSM / Satellite Basemaps"]
 
     %% Frontend (Netlify)
@@ -55,7 +55,7 @@ graph TD
     API_Mangrove -->|Spatial Query| PostGIS
     API_Stats -->|Query| JSON_Stats
     API_Ask -->|Fetch Context| JSON_Stats
-    API_Ask -->|Prompt + Context| Gemini
+    API_Ask -->|Prompt + Context| OpenRouter
 
     RawData -->|Clip & Process| PythonScripts
     PythonScripts -->|Import| PostGIS
@@ -80,7 +80,7 @@ graph TD
 - **Key Endpoints**:
   - `GET /api/mangrove?year=YYYY`: Returns spatial boundaries as GeoJSON.
   - `GET /api/stats`: Returns precomputed area/change statistics.
-  - `POST /api/ask`: Receives user chat queries and forwards them to the Gemini API.
+  - `POST /api/ask`: Receives user chat queries and forwards them to the OpenRouter API.
 - **Hosting**: Heroku (Web Dyno).
 
 ### 2.3. Database (Spatial & Stats)
@@ -99,7 +99,7 @@ graph TD
 - **GitHub Actions** is used as the CI/CD orchestrator.
 - **Frontend Pipeline (`netlify-deploy.yml`)**: Triggered on push to `master`. Builds the Vite project and deploys the `dist/` folder to Netlify.
 - **Backend Pipeline (`heroku-deploy.yml`)**: Triggered on push to `master`. Deploys the FastAPI code to Heroku.
-- **Secrets Management**: GitHub Secrets hold the deploy tokens (`NETLIFY_AUTH_TOKEN`, `HEROKU_API_KEY`). Application secrets (like `GEMINI_API_KEY` and `DATABASE_URL`) are stored in Heroku's Config Vars, never in the frontend or source code.
+- **Secrets Management**: GitHub Secrets hold the deploy tokens (`NETLIFY_AUTH_TOKEN`, `HEROKU_API_KEY`). Application secrets (like `OPENROUTER_API_KEY` dan `DATABASE_URL`) are stored in Heroku's Config Vars, never in the frontend or source code.
 
 ## 4. Local Development (Docker)
 
@@ -114,4 +114,4 @@ To ensure fast response times, low API costs, and high accuracy (preventing LLM 
 1. **No Live DB Analytics**: The LLM does not write SQL or interact directly with PostGIS.
 2. **Context Injection**: When a user asks a question via `/api/ask`, the FastAPI backend fetches the precomputed JSON statistics (total area per year, net loss/gain, highest drop).
 3. **System Prompt Formulation**: The backend wraps the user's question with a System Prompt that injects the JSON data: *"Answer the user's question based ONLY on this provided JSON data..."*
-4. **Execution**: The Gemini API processes the prompt and returns a natural language answer based exclusively on the factual, precomputed metrics.
+4. **Execution**: The OpenRouter API processes the prompt and returns a natural language answer based exclusively on the factual, precomputed metrics.

@@ -1,16 +1,18 @@
 import json
 from pathlib import Path
-from google import genai
-from google.genai import types
+from openai import OpenAI
 from settings import settings
 
 STATS_FILE_PATH = Path(__file__).resolve().parent.parent.parent / "data-pipeline" / "output" / "stats" / "mangrove_stats.json"
 
 def ask_assistant(question: str) -> str:
-    if not settings.GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY is not configured")
+    if not settings.OPENROUTER_API_KEY:
+        raise ValueError("OPENROUTER_API_KEY is not configured")
         
-    client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=settings.OPENROUTER_API_KEY,
+    )
     
     stats_data = {}
     if STATS_FILE_PATH.exists():
@@ -30,11 +32,15 @@ Aturan Ketat:
 3. Jangan pernah melakukan perhitungan spasial, gunakan angka dari statistik yang diberikan.
 """
     
-    response = client.models.generate_content(
-        model='gemini-2.0-flash',
-        contents=question,
-        config=types.GenerateContentConfig(
-            system_instruction=system_instruction,
-        ),
+    response = client.chat.completions.create(
+        model="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        messages=[
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": question}
+        ],
+        extra_headers={
+            "HTTP-Referer": "https://mangrovesight.netlify.app", # Optional, for including your app on openrouter.ai rankings.
+            "X-Title": "MangroveSight" # Optional. Shows in rankings on openrouter.ai.
+        }
     )
-    return response.text
+    return response.choices[0].message.content

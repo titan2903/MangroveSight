@@ -191,7 +191,7 @@ const Home = () => {
                   <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: '#fce4ec', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e91e63', mb: 2 }}>
                     <Cpu size={28} />
                   </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>Gemini AI Assistant</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>OpenRouter AI Assistant</Typography>
                   <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Chatbot integratif yang disuplai dengan konteks statistik untuk menjawab pertanyaan geospasial Anda.</Typography>
                 </Paper>
               </motion.div>
@@ -292,7 +292,7 @@ const Home = () => {
                 <br />All rights reserved.
               </Typography>
               <Typography variant="body2" sx={{ mt: 2, opacity: 0.6, fontSize: '0.8rem' }}>
-                Diberdayakan oleh React, Leaflet, & Google Gemini AI
+                Diberdayakan oleh React, Leaflet, & OpenRouter AI
               </Typography>
             </Grid>
           </Grid>

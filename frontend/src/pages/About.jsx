@@ -63,7 +63,7 @@ const About = () => {
                     Tujuan proyek ini adalah menjembatani kesenjangan aksesibilitas data tersebut dengan menyediakan platform WebGIS interaktif yang mampu memvisualisasikan data perubahan temporal.
                   </Typography>
                   <Typography variant="body1" sx={{ color: '#455a64', lineHeight: 1.8 }}>
-                    Dengan arsitektur analisis yang dihitung sebelumnya (precomputed analytics), pengguna bisa mendapatkan <strong>insight geospasial secara instan</strong> — mulai dari heatmap kepadatan, tren penyusutan luas, hingga perbandingan antar-epoch dengan bantuan Gemini AI Assistant.
+                    Dengan arsitektur analisis yang dihitung sebelumnya (precomputed analytics), pengguna bisa mendapatkan <strong>insight geospasial secara instan</strong> — mulai dari heatmap kepadatan, tren penyusutan luas, hingga perbandingan antar-epoch dengan bantuan OpenRouter AI Assistant.
                   </Typography>
                 </Paper>
               </motion.div>
@@ -112,7 +112,7 @@ const About = () => {
                       'Recharts', 
                       'FastAPI (Python)', 
                       'PostgreSQL + PostGIS',
-                      'Gemini AI Flash 2.0 API',
+                      'OpenRouter AI API',
                       'GitHub Actions (CI/CD)',
                       'Heroku & Netlify'
                     ].map((tech, index) => (

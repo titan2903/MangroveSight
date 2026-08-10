@@ -14,7 +14,7 @@ tags_metadata = [
     },
     {
         "name": "AI",
-        "description": "Endpoint integrasi Gemini untuk AI Assistant khusus MangroveSight.",
+        "description": "Endpoint integrasi OpenRouter AI untuk AI Assistant khusus MangroveSight.",
     },
     {
         "name": "Health",
