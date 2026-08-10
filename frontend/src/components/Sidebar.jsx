@@ -66,7 +66,7 @@ const Sidebar = ({
       const delta = currentEpochStat.area_ha - compareEpochStat.area_ha;
       const pct = (delta / compareEpochStat.area_ha) * 100;
       
-      const prompt = `Dalam analisis perbandingan hutan mangrove Teluk Balikpapan antara tahun ${compareYear} (Luas: ${compareEpochStat.area_ha.toFixed(2)} ha) dan tahun ${selectedYear} (Luas: ${currentEpochStat.area_ha.toFixed(2)} ha), terjadi ${delta > 0 ? 'penambahan' : 'penurunan'} seluas ${Math.abs(delta).toFixed(2)} ha (${pct.toFixed(2)}%). Berikan kesimpulan singkat (maksimal 2 kalimat) tentang tren lingkungan ini dengan bahasa yang profesional namun mudah dipahami.`;
+      const prompt = `Dalam analisis perbandingan hutan mangrove Teluk Balikpapan antara tahun ${compareYear} (Luas: ${compareEpochStat.area_ha.toFixed(2)} ha) dan tahun ${selectedYear} (Luas: ${currentEpochStat.area_ha.toFixed(2)} ha), terjadi ${delta > 0 ? 'penambahan' : 'penurunan'} seluas ${Math.abs(delta).toFixed(2)} ha (${pct.toFixed(2)}%). Berikan kesimpulan singkat (maksimal 2 kalimat) tentang tren lingkungan ini dengan bahasa yang profesional namun mudah dipahami. WAJIB balas dalam Bahasa Indonesia.`;
       
       const response = await askAI(prompt);
       setAiSummary(response.answer);
