@@ -13,13 +13,13 @@ api.interceptors.response.use(
   }
 );
 
-export const fetchMangroveGeoJSON = async (year) => {
-  const response = await api.get(`/mangrove/?year=${year}`);
+export const fetchMangroveGeoJSON = async (year, simplify = false) => {
+  const response = await api.get(`/mangrove/?year=${year}&simplify=${simplify}`);
   return response.data;
 };
 
-export const fetchMangroveComparison = async (year1, year2) => {
-  const response = await api.get(`/mangrove/compare/?year1=${year1}&year2=${year2}`);
+export const fetchMangroveComparison = async (year1, year2, simplify = false) => {
+  const response = await api.get(`/mangrove/compare/?year1=${year1}&year2=${year2}&simplify=${simplify}`);
   return response.data;
 };
 

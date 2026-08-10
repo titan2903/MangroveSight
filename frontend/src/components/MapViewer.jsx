@@ -22,6 +22,19 @@ const FitBounds = ({ data }) => {
   return null;
 };
 
+// ─── Helper: Zoom Listener ────────────────────────────────────────────────
+import { useMapEvents } from 'react-leaflet';
+const ZoomListener = ({ onZoomChange }) => {
+  const map = useMapEvents({
+    zoomend: () => {
+      if (onZoomChange) {
+        onZoomChange(map.getZoom());
+      }
+    }
+  });
+  return null;
+};
+
 // ─── Helper: Feature area calculator ───────────────────────────────────────
 const getAreaHa = (feature) => {
   try {
@@ -33,7 +46,7 @@ const getAreaHa = (feature) => {
 };
 
 // ─── Main Component ──────────────────────────────────────────────────────
-const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear, compareMode }) => {
+const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear, compareMode, onZoomChange }) => {
   const [showYearBadge, setShowYearBadge] = useState(false);
   const [clickedInfo, setClickedInfo] = useState(null);
   const prevYear = useRef(null);
@@ -106,6 +119,7 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         fadeAnimation={true}
         markerZoomAnimation={true}
       >
+        <ZoomListener onZoomChange={onZoomChange} />
         <ZoomControl position="topright" />
         <ScaleControl position="bottomright" imperial={false} />
 

@@ -2,8 +2,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import Any
 
-def get_mangrove_geojson_from_db(year: int, db: Session) -> Any:
-    query = text("""
+def get_mangrove_geojson_from_db(year: int, db: Session, simplify: bool = False) -> Any:
+    # If simplify is True, we use ST_Simplify with 0.0005 degrees tolerance (~50 meters)
+    geometry_expr = "ST_Simplify(geometry, 0.0005)" if simplify else "geometry"
+    
+    query = text(f"""
         SELECT jsonb_build_object(
             'type',     'FeatureCollection',
             'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
@@ -11,7 +14,7 @@ def get_mangrove_geojson_from_db(year: int, db: Session) -> Any:
         FROM (
           SELECT jsonb_build_object(
             'type',       'Feature',
-            'geometry',   ST_AsGeoJSON(geometry)::jsonb,
+            'geometry',   ST_AsGeoJSON({geometry_expr})::jsonb,
             'properties', jsonb_build_object('year', year)
           ) AS feature
           FROM mangrove_extents
@@ -20,15 +23,19 @@ def get_mangrove_geojson_from_db(year: int, db: Session) -> Any:
     """)
     return db.execute(query, {"year": year}).scalar()
 
-def get_mangrove_comparison(year1: int, year2: int, db: Session) -> Any:
+def get_mangrove_comparison(year1: int, year2: int, db: Session, simplify: bool = False) -> Any:
     # Uses ST_Difference and ST_Intersection to find loss, gain, and stable areas
     # Returns a GeoJSON FeatureCollection
-    query = text("""
+    
+    # Simplify geometry directly in CTEs to make ST_Difference and ST_Intersection much faster
+    geometry_expr = "ST_Simplify(geometry, 0.0005)" if simplify else "geometry"
+    
+    query = text(f"""
         WITH y1 AS (
-            SELECT ST_Union(geometry) as geom FROM mangrove_extents WHERE year = :year1
+            SELECT ST_Union({geometry_expr}) as geom FROM mangrove_extents WHERE year = :year1
         ),
         y2 AS (
-            SELECT ST_Union(geometry) as geom FROM mangrove_extents WHERE year = :year2
+            SELECT ST_Union({geometry_expr}) as geom FROM mangrove_extents WHERE year = :year2
         )
         SELECT jsonb_build_object(
             'type', 'FeatureCollection',

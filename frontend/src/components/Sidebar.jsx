@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Box, 
   Paper, 
@@ -9,7 +9,10 @@ import {
   InputLabel,
   Divider,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  IconButton,
+  Button,
+  CircularProgress
 } from '@mui/material';
 import { 
   LineChart, 
@@ -20,6 +23,10 @@ import {
   Tooltip as RechartsTooltip, 
   ResponsiveContainer 
 } from 'recharts';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import MenuIcon from '@mui/icons-material/Menu';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import { askAI } from '../api';
 
 const Sidebar = ({ 
   years, 
@@ -31,8 +38,12 @@ const Sidebar = ({
   compareYear,
   setCompareYear,
   heatmapActive,
-  setHeatmapActive
+  setHeatmapActive,
+  collapsed,
+  onToggleCollapse
 }) => {
+  const [aiSummary, setAiSummary] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
   
   // Format the Recharts data
   const chartData = stats?.epochs?.map(epoch => ({
@@ -41,6 +52,54 @@ const Sidebar = ({
   })) || [];
 
   const currentEpochStat = stats?.epochs?.find(e => e.year === selectedYear);
+  const compareEpochStat = stats?.epochs?.find(e => e.year === compareYear);
+
+  const handleAskAI = async () => {
+    if (!currentEpochStat || !compareEpochStat) return;
+    
+    setAiLoading(true);
+    setAiSummary('');
+    try {
+      const delta = currentEpochStat.area_ha - compareEpochStat.area_ha;
+      const pct = (delta / compareEpochStat.area_ha) * 100;
+      
+      const prompt = `Dalam analisis perbandingan hutan mangrove Teluk Balikpapan antara tahun ${compareYear} (Luas: ${compareEpochStat.area_ha.toFixed(2)} ha) dan tahun ${selectedYear} (Luas: ${currentEpochStat.area_ha.toFixed(2)} ha), terjadi ${delta > 0 ? 'penambahan' : 'penurunan'} seluas ${Math.abs(delta).toFixed(2)} ha (${pct.toFixed(2)}%). Berikan kesimpulan singkat (maksimal 2 kalimat) tentang tren lingkungan ini dengan bahasa yang profesional namun mudah dipahami.`;
+      
+      const response = await askAI(prompt);
+      setAiSummary(response.answer);
+    } catch (error) {
+      console.error("AI Error:", error);
+      setAiSummary("Maaf, gagal menghubungi asisten AI saat ini.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  if (collapsed) {
+    return (
+      <Paper 
+        elevation={4} 
+        sx={{ 
+          width: 60, 
+          height: 60, 
+          position: 'absolute', 
+          top: '5vh', 
+          left: 20, 
+          zIndex: 1000,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(12px)',
+          borderRadius: '50%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          cursor: 'pointer'
+        }}
+        onClick={onToggleCollapse}
+      >
+        <MenuIcon sx={{ color: '#004D40' }} />
+      </Paper>
+    );
+  }
 
   return (
     <Paper 
@@ -58,15 +117,23 @@ const Sidebar = ({
         display: 'flex',
         flexDirection: 'column',
         p: 3,
-        overflowY: 'auto'
+        overflowY: 'auto',
+        transition: 'all 0.3s ease'
       }}
     >
-      <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#004D40', mb: 1 }}>
-        MangroveSight
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Pemantauan WebGIS Teluk Balikpapan
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#004D40' }}>
+            MangroveSight
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Pemantauan WebGIS
+          </Typography>
+        </Box>
+        <IconButton onClick={onToggleCollapse} size="small" sx={{ color: '#004D40' }}>
+          <MenuOpenIcon />
+        </IconButton>
+      </Box>
 
       <Divider sx={{ mb: 3 }} />
 
@@ -103,8 +170,6 @@ const Sidebar = ({
           </Select>
         </FormControl>
       )}
-
-      <Divider sx={{ mb: 2 }} />
 
       <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
         Mode Analisis Tingkat Lanjut
@@ -169,20 +234,45 @@ const Sidebar = ({
       )}
 
       {compareMode && (
-        <Box sx={{ p: 2, bgcolor: 'rgba(255, 152, 0, 0.1)', borderRadius: 2, mb: 4 }}>
-          <Typography variant="body2" color="text.secondary">Legenda Perbandingan</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: '#FF5252', borderRadius: '50%', mr: 1 }} />
-            <Typography variant="caption">Hilang (Loss)</Typography>
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ p: 2, bgcolor: 'rgba(255, 152, 0, 0.1)', borderRadius: 2, mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">Legenda Perbandingan</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <Box sx={{ width: 16, height: 16, bgcolor: '#FF5252', borderRadius: '50%', mr: 1 }} />
+              <Typography variant="caption">Hilang (Loss)</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <Box sx={{ width: 16, height: 16, bgcolor: '#00E5FF', borderRadius: '50%', mr: 1 }} />
+              <Typography variant="caption">Bertambah (Gain)</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <Box sx={{ width: 16, height: 16, bgcolor: '#00BFA5', borderRadius: '50%', mr: 1 }} />
+              <Typography variant="caption">Tetap (Stable)</Typography>
+            </Box>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: '#00E5FF', borderRadius: '50%', mr: 1 }} />
-            <Typography variant="caption">Bertambah (Gain)</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: '#00BFA5', borderRadius: '50%', mr: 1 }} />
-            <Typography variant="caption">Tetap (Stable)</Typography>
-          </Box>
+          
+          <Button
+            fullWidth
+            variant="contained"
+            color="secondary"
+            startIcon={aiLoading ? <CircularProgress size={20} color="inherit" /> : <AutoAwesomeIcon />}
+            onClick={handleAskAI}
+            disabled={aiLoading}
+            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
+          >
+            {aiLoading ? 'Menganalisis...' : '🤖 Jelaskan dengan AI'}
+          </Button>
+
+          {aiSummary && (
+            <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 2, border: '1px solid #e0e0e0' }}>
+              <Typography variant="caption" sx={{ color: '#004D40', fontWeight: 'bold', display: 'flex', alignItems: 'center', mb: 1 }}>
+                <AutoAwesomeIcon sx={{ fontSize: 14, mr: 0.5 }} /> AI Summary
+              </Typography>
+              <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#555' }}>
+                "{aiSummary}"
+              </Typography>
+            </Box>
+          )}
         </Box>
       )}
 

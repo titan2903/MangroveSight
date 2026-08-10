@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box } from '@mui/material';
 import MapViewer from '../components/MapViewer';
 import Sidebar from '../components/Sidebar';
@@ -11,6 +11,7 @@ const Maps = () => {
   const [compareYear, setCompareYear] = useState(null);
   const [compareMode, setCompareMode] = useState(false);
   const [heatmapActive, setHeatmapActive] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const [stats, setStats] = useState(null);
   const [geoData, setGeoData] = useState(null);
@@ -18,6 +19,9 @@ const Maps = () => {
   const [heatmapData, setHeatmapData] = useState(null);
 
   const [mapLoading, setMapLoading] = useState(false);
+  
+  // By default, simplify geometries for performance
+  const [simplifyGeoJSON, setSimplifyGeoJSON] = useState(true);
 
   // Initial Load: Fetch years and stats
   useEffect(() => {
@@ -48,11 +52,11 @@ const Maps = () => {
       setMapLoading(true);
       try {
         if (compareMode && compareYear) {
-          const compData = await fetchMangroveComparison(selectedYear, compareYear);
+          const compData = await fetchMangroveComparison(selectedYear, compareYear, simplifyGeoJSON);
           setCompareData(compData);
           setGeoData(null);
         } else {
-          const data = await fetchMangroveGeoJSON(selectedYear);
+          const data = await fetchMangroveGeoJSON(selectedYear, simplifyGeoJSON);
           setGeoData(data);
           setCompareData(null);
         }
@@ -71,10 +75,19 @@ const Maps = () => {
     };
 
     loadData();
-  }, [selectedYear, compareYear, compareMode, heatmapActive]);
+  }, [selectedYear, compareYear, compareMode, heatmapActive, simplifyGeoJSON]);
+
+  const handleZoomChange = useCallback((zoomLevel) => {
+    // If zoomed in close (>= 12), load full resolution geometries. Otherwise simplify.
+    if (zoomLevel >= 12 && simplifyGeoJSON) {
+      setSimplifyGeoJSON(false);
+    } else if (zoomLevel < 12 && !simplifyGeoJSON) {
+      setSimplifyGeoJSON(true);
+    }
+  }, [simplifyGeoJSON]);
 
   return (
-    <Box sx={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden', position: 'relative' }}>
+    <Box sx={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden', position: 'relative', display: 'flex' }}>
       <Sidebar
         years={years}
         selectedYear={selectedYear}
@@ -86,16 +99,22 @@ const Maps = () => {
         setCompareYear={setCompareYear}
         heatmapActive={heatmapActive}
         setHeatmapActive={setHeatmapActive}
+        collapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
-      <MapViewer
-        data={geoData}
-        compareData={compareData}
-        heatmapData={heatmapData}
-        loading={mapLoading}
-        year={selectedYear}
-        compareYear={compareYear}
-        compareMode={compareMode}
-      />
+      
+      <Box sx={{ flexGrow: 1, height: '100%', position: 'relative' }}>
+        <MapViewer
+          data={geoData}
+          compareData={compareData}
+          heatmapData={heatmapData}
+          loading={mapLoading}
+          year={selectedYear}
+          compareYear={compareYear}
+          compareMode={compareMode}
+          onZoomChange={handleZoomChange}
+        />
+      </Box>
       <ChatAssistant />
     </Box>
   );
