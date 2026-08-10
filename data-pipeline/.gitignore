@@ -3,6 +3,7 @@
 
 # data input
 input/
-output/
+output/*
 !output/stats/
+output/stats/*
 !output/stats/mangrove_stats.json
