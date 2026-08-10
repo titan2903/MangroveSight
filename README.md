@@ -28,6 +28,14 @@ MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari F
 - `data-pipeline/`: Skrip Python untuk memotong (*clip*) raw data GMW secara spesifik ke area *Bounding Box* Teluk Balikpapan, menghitung luasan statistik, dan mengimpor spasial ke tabel PostGIS.
 - `backend/`: Server API (*Clean Architecture*) yang menyediakan *endpoints* GeoJSON spasial, endpoint analitik on-the-fly (Heatmap, Compare), serta merutekan interaksi Chat AI ke OpenRouter.
 - `frontend/`: Aplikasi web interaktif bergaya modern (*Glassmorphism*, nuansa alam hijau/teal) yang di-build menggunakan Vite.
+- `.github/workflows/`: Skrip CI/CD GitHub Actions untuk *auto-deploy* ke Netlify (Frontend), Heroku (Backend), dan Vercel (Backup Frontend).
+
+### Deployment (CI/CD)
+1. Backend: Heroku Web Dyno (FastAPI) + Heroku Postgres (PostGIS).
+2. Frontend (Utama): Netlify (Akses: `mangrovesight.netlify.app`).
+3. Frontend (Backup): Vercel (Menggunakan `.github/workflows/vercel-deploy.yml` dan konfigurasi `vercel.json`).
+
+> **Catatan:** Untuk mengaktifkan deployment ke Vercel sebagai cadangan, pastikan Anda telah mengatur GitHub Secrets berikut: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, dan `VERCEL_PROJECT_ID`.
 
 ### Cara Menjalankan Aplikasi Secara Lokal
 

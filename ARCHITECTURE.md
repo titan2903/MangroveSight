@@ -98,8 +98,9 @@ graph TD
 
 - **GitHub Actions** is used as the CI/CD orchestrator.
 - **Frontend Pipeline (`netlify-deploy.yml`)**: Triggered on push to `master`. Builds the Vite project and deploys the `dist/` folder to Netlify.
+- **Backup Frontend Pipeline (`vercel-deploy.yml`)**: Serves as a backup deployment to Vercel if Netlify limits are exceeded.
 - **Backend Pipeline (`heroku-deploy.yml`)**: Triggered on push to `master`. Deploys the FastAPI code to Heroku.
-- **Secrets Management**: GitHub Secrets hold the deploy tokens (`NETLIFY_AUTH_TOKEN`, `HEROKU_API_KEY`). Application secrets (like `OPENROUTER_API_KEY` dan `DATABASE_URL`) are stored in Heroku's Config Vars, never in the frontend or source code.
+- **Secrets Management**: GitHub Secrets hold the deploy tokens (`NETLIFY_AUTH_TOKEN`, `HEROKU_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`). Application secrets (like `OPENROUTER_API_KEY` dan `DATABASE_URL`) are stored in Heroku's Config Vars, never in the frontend or source code.
 
 ## 4. Local Development (Docker)
 
