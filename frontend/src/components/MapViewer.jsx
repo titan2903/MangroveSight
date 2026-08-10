@@ -13,89 +13,8 @@ import { IconButton } from '@mui/material';
 
 const { BaseLayer } = LayersControl;
 
-// ─── Helper: Animated Fly to Bounds ───────────────────────────────────────
-const FitBounds = ({ data }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (data && data.features && data.features.length > 0) {
-      const geoJsonLayer = L.geoJSON(data);
-      map.flyToBounds(geoJsonLayer.getBounds(), { padding: [60, 60], duration: 1.8, easeLinearity: 0.3 });
-    }
-  }, [data, map]);
-  return null;
-};
+import { FitBounds, ZoomListener, CoordinateDisplay, MinimapSync, getAreaHa } from './MapHelpers';
 
-// ─── Helper: Zoom Listener ────────────────────────────────────────────────
-import { useMapEvents } from 'react-leaflet';
-const ZoomListener = ({ onZoomChange }) => {
-  const map = useMapEvents({
-    zoomend: () => {
-      if (onZoomChange) {
-        onZoomChange(map.getZoom());
-      }
-    },
-    dragstart: () => {
-      // Force close any stuck tooltips when panning the map
-      map.eachLayer(layer => {
-        if (layer.closeTooltip) {
-          layer.closeTooltip();
-        }
-      });
-    }
-  });
-  return null;
-};
-
-// ─── Helper: Coordinate Display ───────────────────────────────────────────
-const CoordinateDisplay = () => {
-  const [pos, setPos] = useState({ lat: -1.2, lng: 116.8 });
-  useMapEvents({
-    mousemove(e) {
-      setPos(e.latlng);
-    }
-  });
-  return (
-    <Box sx={{ 
-      position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, 
-      bgcolor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)',
-      px: 1.5, py: 0.5, borderRadius: 2, border: '1px solid #ddd',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-    }}>
-      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#333', fontWeight: 600 }}>
-        Lat: {pos.lat.toFixed(5)} | Lng: {pos.lng.toFixed(5)}
-      </Typography>
-    </Box>
-  );
-};
-
-// ─── Helper: Minimap Sync ────────────────────────────────────────────────
-const MinimapSync = ({ parentMap }) => {
-  const minimap = useMap();
-  useEffect(() => {
-    if (!parentMap) return;
-    const updateMinimap = () => {
-      minimap.setView(parentMap.getCenter(), Math.max(parentMap.getZoom() - 5, 0));
-    };
-    parentMap.on('move', updateMinimap);
-    parentMap.on('zoom', updateMinimap);
-    updateMinimap();
-    return () => {
-      parentMap.off('move', updateMinimap);
-      parentMap.off('zoom', updateMinimap);
-    };
-  }, [parentMap, minimap]);
-  return null;
-};
-
-// ─── Helper: Feature area calculator ───────────────────────────────────────
-const getAreaHa = (feature) => {
-  try {
-    if (feature.properties) {
-      return (feature.properties.area_ha || feature.properties.luas_ha || '—');
-    }
-  } catch { return '—'; }
-  return '—';
-};
 
 // ─── Main Component ──────────────────────────────────────────────────────
 const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear, compareMode, onZoomChange }) => {
@@ -468,59 +387,7 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         </Box>
       </Fade>
 
-      {/* ── Global CSS Animations ─────────────────────────── */}
-      <style>{`
-        @keyframes spin {
-          0%   { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes popIn {
-          0%   { opacity: 0; transform: scale(0.5); }
-          80%  { transform: scale(1.05); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0.6; }
-        }
-        .leaflet-interactive {
-          transition: fill-opacity 0.25s ease, stroke-width 0.2s ease;
-        }
-        .custom-tooltip {
-          background-color: rgba(255,255,255,0.97) !important;
-          border: 1px solid #00BFA5 !important;
-          border-radius: 10px !important;
-          box-shadow: 0 6px 20px rgba(0,77,64,0.15) !important;
-          padding: 10px 14px !important;
-        }
-        .leaflet-tooltip-left.custom-tooltip::before  { border-left-color:  #00BFA5 !important; }
-        .leaflet-tooltip-right.custom-tooltip::before { border-right-color: #00BFA5 !important; }
-        .leaflet-control-layers {
-          border-radius: 10px !important;
-          border: none !important;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
-          overflow: hidden;
-        }
-        .leaflet-control-layers-expanded { padding: 12px !important; }
-        /* Push zoom controls down from top to avoid overlapping with layers control */
-        .leaflet-top.leaflet-right {
-          top: 10px !important;
-        }
-        .leaflet-control-zoom {
-          margin-top: 60px !important;
-        }
-        .leaflet-control-zoom a {
-          border-radius: 6px !important;
-          transition: background 0.2s !important;
-        }
-        .leaflet-control-zoom a:hover {
-          background-color: #004D40 !important;
-          color: white !important;
-        }
-        .leaflet-bar a {
-          transition: all 0.2s ease !important;
-        }
-      `}</style>
+
     </Box>
   );
 };
