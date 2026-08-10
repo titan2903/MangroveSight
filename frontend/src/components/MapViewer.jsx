@@ -6,7 +6,10 @@ import * as L from 'leaflet';
 import ForestIcon from '@mui/icons-material/Forest';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import LayersIcon from '@mui/icons-material/Layers';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import HeatmapLayer from './HeatmapLayer';
+import html2canvas from 'html2canvas';
+import { IconButton } from '@mui/material';
 
 const { BaseLayer } = LayersControl;
 
@@ -30,8 +33,57 @@ const ZoomListener = ({ onZoomChange }) => {
       if (onZoomChange) {
         onZoomChange(map.getZoom());
       }
+    },
+    dragstart: () => {
+      // Force close any stuck tooltips when panning the map
+      map.eachLayer(layer => {
+        if (layer.closeTooltip) {
+          layer.closeTooltip();
+        }
+      });
     }
   });
+  return null;
+};
+
+// ─── Helper: Coordinate Display ───────────────────────────────────────────
+const CoordinateDisplay = () => {
+  const [pos, setPos] = useState({ lat: -1.2, lng: 116.8 });
+  useMapEvents({
+    mousemove(e) {
+      setPos(e.latlng);
+    }
+  });
+  return (
+    <Box sx={{ 
+      position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, 
+      bgcolor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)',
+      px: 1.5, py: 0.5, borderRadius: 2, border: '1px solid #ddd',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#333', fontWeight: 600 }}>
+        Lat: {pos.lat.toFixed(5)} | Lng: {pos.lng.toFixed(5)}
+      </Typography>
+    </Box>
+  );
+};
+
+// ─── Helper: Minimap Sync ────────────────────────────────────────────────
+const MinimapSync = ({ parentMap }) => {
+  const minimap = useMap();
+  useEffect(() => {
+    if (!parentMap) return;
+    const updateMinimap = () => {
+      minimap.setView(parentMap.getCenter(), Math.max(parentMap.getZoom() - 5, 0));
+    };
+    parentMap.on('move', updateMinimap);
+    parentMap.on('zoom', updateMinimap);
+    updateMinimap();
+    return () => {
+      parentMap.off('move', updateMinimap);
+      parentMap.off('zoom', updateMinimap);
+    };
+  }, [parentMap, minimap]);
   return null;
 };
 
@@ -49,6 +101,8 @@ const getAreaHa = (feature) => {
 const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear, compareMode, onZoomChange }) => {
   const [showYearBadge, setShowYearBadge] = useState(false);
   const [clickedInfo, setClickedInfo] = useState(null);
+  const [parentMap, setParentMap] = useState(null);
+  const [isCapturing, setIsCapturing] = useState(false);
   const prevYear = useRef(null);
 
   // Animate year badge whenever year changes
@@ -60,6 +114,31 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
       return () => clearTimeout(t);
     }
   }, [year]);
+
+  const handleScreenshot = () => {
+    setIsCapturing(true);
+    setTimeout(() => {
+      const mapElement = document.getElementById('map-capture-area');
+      if (mapElement) {
+        html2canvas(mapElement, { 
+          useCORS: true,
+          allowTaint: true,
+          ignoreElements: (node) => node.classList && node.classList.contains('no-capture')
+        }).then((canvas) => {
+          const link = document.createElement('a');
+          link.download = `MangroveSight_${year}.png`;
+          link.href = canvas.toDataURL();
+          link.click();
+          setIsCapturing(false);
+        }).catch(err => {
+          console.error("Screenshot error:", err);
+          setIsCapturing(false);
+        });
+      } else {
+        setIsCapturing(false);
+      }
+    }, 500); // small delay to hide some UI if needed
+  };
 
   // Dismiss popup on map click (via key)
   const handleMapClick = () => setClickedInfo(null);
@@ -83,7 +162,6 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
     layer.on({
       mouseover: (e) => {
         e.target.setStyle({ weight: 3, color: '#FFFFFF', fillColor: baseColor, fillOpacity: 0.9 });
-        e.target.bringToFront();
       },
       mouseout: (e) => {
         e.target.setStyle({ weight: 1, color: baseColor, fillColor: baseColor, fillOpacity: compareMode ? 0.8 : 0.6 });
@@ -109,8 +187,9 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
   }, [year, compareYear, compareMode]);
 
   return (
-    <Box sx={{ height: '100%', width: '100%', position: 'relative' }} onClick={handleMapClick}>
+    <Box id="map-capture-area" sx={{ height: '100%', width: '100%', position: 'relative' }} onClick={handleMapClick}>
       <MapContainer
+
         center={[-1.2, 116.8]}
         zoom={10}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
@@ -118,7 +197,9 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         zoomAnimation={true}
         fadeAnimation={true}
         markerZoomAnimation={true}
+        ref={setParentMap}
       >
+        <CoordinateDisplay />
         <ZoomListener onZoomChange={onZoomChange} />
         <ZoomControl position="topright" />
         <ScaleControl position="bottomright" imperial={false} />
@@ -152,7 +233,7 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
 
         {data && !compareMode && (
           <GeoJSON
-            key={`data-${year}`}
+            key={`data-${year}-${data.features?.length || 0}`}
             data={data}
             style={{
               color: '#00BFA5',
@@ -175,7 +256,7 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         
         {compareData && compareMode && (
           <GeoJSON
-            key={`compare-${year}-${compareYear}`}
+            key={`compare-${year}-${compareYear}-${compareData.features?.length || 0}`}
             data={compareData}
             style={(feature) => ({
               color: feature.properties.color || '#00BFA5',
@@ -286,6 +367,70 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
           />
         )}
       </Box>
+
+      {/* ── Minimap (Overview Map) ────────────────────────── */}
+      <Box className="no-capture" sx={{
+        position: 'absolute',
+        bottom: 30,
+        left: 390,
+        width: 150,
+        height: 150,
+        zIndex: 1000,
+        border: '3px solid white',
+        borderRadius: 2,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        overflow: 'hidden'
+      }}>
+        <MapContainer
+          center={[-1.2, 116.8]}
+          zoom={5}
+          zoomControl={false}
+          scrollWheelZoom={false}
+          dragging={false}
+          doubleClickZoom={false}
+          touchZoom={false}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+          {/* Rectangle roughly covering Balikpapan Bay area */}
+          <GeoJSON 
+            data={{
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "Polygon",
+                coordinates: [[[116.7, -1.1], [117.1, -1.1], [117.1, -1.6], [116.7, -1.6], [116.7, -1.1]]]
+              }
+            }} 
+            style={{ color: '#00BFA5', weight: 2, fillOpacity: 0 }}
+          />
+          <MinimapSync parentMap={parentMap} />
+        </MapContainer>
+      </Box>
+
+      {/* ── Screenshot Button ─────────────────────────────── */}
+      <Box className="no-capture" sx={{
+        position: 'absolute',
+        top: 20,
+        right: 70, // right of zoom control
+        zIndex: 1000,
+      }}>
+        <Tooltip title="Capture Map" placement="left">
+          <IconButton
+            onClick={handleScreenshot}
+            disabled={isCapturing}
+            sx={{
+              bgcolor: 'rgba(255,255,255,0.9)',
+              color: '#004D40',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              '&:hover': { bgcolor: '#fff' }
+            }}
+          >
+            <CameraAltIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
 
       {/* ── Premium Glassmorphism Loading Overlay ─────────── */}
       <Fade in={loading} timeout={300}>

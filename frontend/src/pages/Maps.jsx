@@ -20,8 +20,8 @@ const Maps = () => {
 
   const [mapLoading, setMapLoading] = useState(false);
   
-  // By default, simplify geometries for performance
-  const [simplifyGeoJSON, setSimplifyGeoJSON] = useState(true);
+  // Disable simplification to avoid loading screens on zoom
+  const [simplifyGeoJSON, setSimplifyGeoJSON] = useState(false);
 
   // Initial Load: Fetch years and stats
   useEffect(() => {
@@ -78,13 +78,9 @@ const Maps = () => {
   }, [selectedYear, compareYear, compareMode, heatmapActive, simplifyGeoJSON]);
 
   const handleZoomChange = useCallback((zoomLevel) => {
-    // If zoomed in close (>= 12), load full resolution geometries. Otherwise simplify.
-    if (zoomLevel >= 12 && simplifyGeoJSON) {
-      setSimplifyGeoJSON(false);
-    } else if (zoomLevel < 12 && !simplifyGeoJSON) {
-      setSimplifyGeoJSON(true);
-    }
-  }, [simplifyGeoJSON]);
+    // Disabled: Dynamic zoom-based simplification causes annoying loading screens
+    // when zooming in and out. Always use full resolution (or fixed simplify).
+  }, []);
 
   return (
     <Box sx={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden', position: 'relative', display: 'flex' }}>
@@ -101,6 +97,8 @@ const Maps = () => {
         setHeatmapActive={setHeatmapActive}
         collapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        geoData={geoData}
+        compareData={compareData}
       />
       
       <Box sx={{ flexGrow: 1, height: '100%', position: 'relative' }}>

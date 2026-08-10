@@ -26,6 +26,7 @@ import {
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import DownloadIcon from '@mui/icons-material/Download';
 import { askAI } from '../api';
 
 const Sidebar = ({ 
@@ -40,7 +41,9 @@ const Sidebar = ({
   heatmapActive,
   setHeatmapActive,
   collapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  geoData,
+  compareData
 }) => {
   const [aiSummary, setAiSummary] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -73,6 +76,29 @@ const Sidebar = ({
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const exportCSV = () => {
+    if (!stats?.epochs) return;
+    const header = "Tahun,Luas (ha),Perubahan (ha),Perubahan (%)\n";
+    const rows = stats.epochs.map(e => `${e.year},${e.area_ha},${e.delta_ha || 0},${e.delta_pct || 0}`).join("\n");
+    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mangrove_stats.csv';
+    a.click();
+  };
+
+  const exportGeoJSON = () => {
+    const dataToExport = compareMode ? compareData : geoData;
+    if (!dataToExport) return;
+    const blob = new Blob([JSON.stringify(dataToExport)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mangrove_${selectedYear}${compareMode ? '_vs_'+compareYear : ''}.geojson`;
+    a.click();
   };
 
   if (collapsed) {
@@ -302,6 +328,28 @@ const Sidebar = ({
             />
           </LineChart>
         </ResponsiveContainer>
+      </Box>
+
+      <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
+        <Button 
+          variant="outlined" 
+          size="small" 
+          startIcon={<DownloadIcon />} 
+          onClick={exportCSV}
+          sx={{ flex: 1, textTransform: 'none' }}
+        >
+          CSV Stats
+        </Button>
+        <Button 
+          variant="outlined" 
+          size="small" 
+          startIcon={<DownloadIcon />} 
+          onClick={exportGeoJSON}
+          disabled={!geoData && !compareData}
+          sx={{ flex: 1, textTransform: 'none' }}
+        >
+          GeoJSON
+        </Button>
       </Box>
 
     </Paper>

@@ -10,6 +10,7 @@ import {
   Slide
 } from '@mui/material';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { askAI } from '../api';
 
 const ChatAssistant = () => {
@@ -93,7 +94,17 @@ const ChatAssistant = () => {
                   boxShadow: 1
                 }}
               >
-                <Typography variant="body2">{msg.text}</Typography>
+                <Typography variant="body2" component="div">
+                  <ReactMarkdown
+                    components={{
+                      p: ({node, ...props}) => <p style={{margin: '0 0 8px 0'}} {...props} />,
+                      a: ({node, ...props}) => <a style={{color: msg.sender === 'user' ? '#fff' : '#00BFA5'}} {...props} />,
+                      ul: ({node, ...props}) => <ul style={{margin: '0 0 8px 0', paddingLeft: '20px'}} {...props} />
+                    }}
+                  >
+                    {msg.text}
+                  </ReactMarkdown>
+                </Typography>
               </Box>
             ))}
             {loading && (
