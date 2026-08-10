@@ -4,7 +4,8 @@ from openai import OpenAI
 from settings import settings
 
 STATS_FILE_PATH = Path(__file__).resolve().parent.parent.parent / "data-pipeline" / "output" / "stats" / "mangrove_stats.json"
-
+if not STATS_FILE_PATH.exists():
+    STATS_FILE_PATH = Path(__file__).resolve().parent.parent / "data" / "mangrove_stats.json"
 def ask_assistant(question: str) -> str:
     if not settings.OPENROUTER_API_KEY:
         raise ValueError("OPENROUTER_API_KEY is not configured")
