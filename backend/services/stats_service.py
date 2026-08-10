@@ -5,6 +5,10 @@ from fastapi import HTTPException
 
 STATS_FILE_PATH = Path(__file__).resolve().parent.parent.parent / "data-pipeline" / "output" / "stats" / "mangrove_stats.json"
 
+# Fallback untuk environment Heroku production (karena appdir="backend", folder data-pipeline tidak ter-deploy)
+if not STATS_FILE_PATH.exists():
+    STATS_FILE_PATH = Path(__file__).resolve().parent.parent / "data" / "mangrove_stats.json"
+
 def get_full_stats() -> Dict[str, Any]:
     if not STATS_FILE_PATH.exists():
         raise HTTPException(status_code=404, detail="Stats data file not found")

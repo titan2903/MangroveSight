@@ -15,6 +15,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Copy stats data to backend for Heroku
+        run: |
+          mkdir -p backend/data
+          cp data-pipeline/output/stats/mangrove_stats.json backend/data/mangrove_stats.json
+
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
