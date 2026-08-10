@@ -3,6 +3,8 @@ import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import MapIcon from '@mui/icons-material/Map';
 import HomeIcon from '@mui/icons-material/Home';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import InfoIcon from '@mui/icons-material/Info';
 
 const Navbar = () => {
   const location = useLocation();
@@ -37,6 +39,30 @@ const Navbar = () => {
             }}
           >
             Maps
+          </Button>
+          <Button 
+            color="inherit" 
+            component={Link} 
+            to="/chart"
+            startIcon={<BarChartIcon />}
+            sx={{ 
+              borderBottom: location.pathname === '/chart' ? '2px solid #00BFA5' : '2px solid transparent',
+              borderRadius: 0
+            }}
+          >
+            Chart
+          </Button>
+          <Button 
+            color="inherit" 
+            component={Link} 
+            to="/about"
+            startIcon={<InfoIcon />}
+            sx={{ 
+              borderBottom: location.pathname === '/about' ? '2px solid #00BFA5' : '2px solid transparent',
+              borderRadius: 0
+            }}
+          >
+            About
           </Button>
         </Box>
       </Toolbar>

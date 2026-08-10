@@ -1,21 +1,19 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
 from schemas import StatsResponse
 from services import stats_service
-from db import get_db
 
 router = APIRouter()
 
 @router.get("/", response_model=StatsResponse)
-def get_stats(db: Session = Depends(get_db)):
+def get_stats():
     """
-    Mengambil data statistik mangrove (dihitung on-the-fly dari database).
+    Mengambil data statistik mangrove dari precomputed JSON.
     """
-    return stats_service.get_full_stats(db)
+    return stats_service.get_full_stats()
 
 @router.get("/years")
-def get_available_years(db: Session = Depends(get_db)):
+def get_available_years():
     """
-    Mengambil daftar tahun epoch yang tersedia (dihitung dari database).
+    Mengambil daftar tahun epoch yang tersedia dari precomputed JSON.
     """
-    return stats_service.get_available_years(db)
+    return stats_service.get_available_years()

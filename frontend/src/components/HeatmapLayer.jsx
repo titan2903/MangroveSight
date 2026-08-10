@@ -12,6 +12,20 @@ const HeatmapLayer = ({ points }) => {
   useEffect(() => {
     if (!map || typeof L.heatLayer === 'undefined') return;
 
+    // Fix: Monkey patch L.HeatLayer._redraw and _update to check this._map
+    // This prevents "Cannot read properties of null (reading 'getSize')"
+    // when a requestAnimationFrame fires after the layer is removed.
+    if (L.HeatLayer) {
+      const originalRedraw = L.HeatLayer.prototype._redraw;
+      if (originalRedraw && !L.HeatLayer.prototype._redraw_patched) {
+        L.HeatLayer.prototype._redraw = function() {
+          if (!this._map) return;
+          return originalRedraw.call(this);
+        };
+        L.HeatLayer.prototype._redraw_patched = true;
+      }
+    }
+
     heatLayerRef.current = L.heatLayer([], {
       radius: 25,
       blur: 20,

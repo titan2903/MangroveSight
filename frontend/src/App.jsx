@@ -4,6 +4,8 @@ import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Maps from './pages/Maps';
+import Chart from './pages/Chart';
+import About from './pages/About';
 import './App.css';
 
 // Create a premium Mangrove-inspired Material UI theme
@@ -39,6 +41,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/maps" element={<Maps />} />
+            <Route path="/chart" element={<Chart />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </Box>
       </Router>
