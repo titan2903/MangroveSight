@@ -37,7 +37,7 @@ OUTPUT_FILE = STATS_DIR / "mangrove_stats.json"
 UTM_CRS = "EPSG:32750"
 
 # Daftar epoch yang diharapkan, sesuai PRD
-EXPECTED_EPOCHS = [2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020]
+EXPECTED_EPOCHS = [2007, 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019, 2020, 2022]
 
 
 def calculate_area_ha(gdf: gpd.GeoDataFrame) -> float:

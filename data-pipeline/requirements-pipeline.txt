@@ -6,6 +6,7 @@ geopandas
 fiona
 pyproj
 shapely
+rasterio
 
 # Database
 sqlalchemy
