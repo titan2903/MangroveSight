@@ -23,7 +23,7 @@ def ask_assistant(question: str) -> str:
     stats_context = json.dumps(stats_data, indent=2)
     
     system_instruction = f"""Anda adalah AI Assistant spesialis MangroveSight.
-Tugas Anda adalah menjawab pertanyaan HANYA terkait dengan data mangrove di Teluk Balikpapan antara tahun 2007 hingga 2020.
+Tugas Anda adalah menjawab pertanyaan HANYA terkait dengan data mangrove di Teluk Balikpapan antara tahun 2007 hingga 2022.
 Berikut adalah data statistik (precomputed) yang menjadi satu-satunya sumber angka dan tren Anda:
 {stats_context}
 

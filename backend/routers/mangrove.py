@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.get("/")
 def get_mangrove_geojson(
-    year: int = Query(..., description="Tahun epoch (2007-2020)"), 
+    year: int = Query(..., description="Tahun epoch (2007-2022)"), 
     simplify: bool = Query(False, description="Apakah geometri disederhanakan untuk zoom rendah?"),
     db: Session = Depends(get_db)
 ):

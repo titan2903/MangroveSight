@@ -6,7 +6,7 @@ from routers import mangrove, stats, ai
 tags_metadata = [
     {
         "name": "Mangrove",
-        "description": "Endpoint untuk mengambil data spasial GeoJSON hutan mangrove (2007-2020).",
+        "description": "Endpoint untuk mengambil data spasial GeoJSON hutan mangrove (2007-2022).",
     },
     {
         "name": "Statistics",
@@ -26,7 +26,7 @@ app = FastAPI(
     title="MangroveSight API",
     description="""
 **Backend API untuk MangroveSight WebGIS.**
-API ini menyediakan data spasial dan statistik terkait perubahan hutan mangrove di Teluk Balikpapan (2007-2020),
+API ini menyediakan data spasial dan statistik terkait perubahan hutan mangrove di Teluk Balikpapan (2007-2022),
 serta asisten AI yang dapat menjawab pertanyaan seputar data tersebut.
 """,
     version="1.0.0",

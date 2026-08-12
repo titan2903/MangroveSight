@@ -84,7 +84,7 @@ const Home = () => {
               MangroveSight
             </Typography>
             <Typography variant="h5" sx={{ mb: 5, fontWeight: 300, lineHeight: 1.6, opacity: 0.95, textShadow: '0px 2px 4px rgba(0,0,0,0.5)' }}>
-              Eksplorasi Dinamika Spasial & Perubahan Ekologis Hutan Mangrove Teluk Balikpapan (2007 - 2020)
+              Eksplorasi Dinamika Spasial & Perubahan Ekologis Hutan Mangrove Teluk Balikpapan (2007 - 2022)
             </Typography>
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -153,7 +153,7 @@ const Home = () => {
                     <Map size={28} />
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#004D40' }}>Change Detection</Typography>
-                  <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Analisis poligon otomatis untuk melacak area yang hilang, tumbuh, atau stabil (2007-2020).</Typography>
+                  <Typography variant="body2" sx={{ color: '#607d8b', lineHeight: 1.6 }}>Analisis poligon otomatis untuk melacak area yang hilang, tumbuh, atau stabil (2007-2022).</Typography>
                 </Paper>
               </motion.div>
             </Box>
@@ -256,7 +256,7 @@ const Home = () => {
                 MangroveSight
               </Typography>
               <Typography variant="body2" sx={{ mb: 2, opacity: 0.8 }}>
-                Sistem Informasi Geografis & Change Detection Deforestasi Mangrove Teluk Balikpapan (2007-2020)
+                Sistem Informasi Geografis & Change Detection Deforestasi Mangrove Teluk Balikpapan (2007-2022)
               </Typography>
             </Grid>
 

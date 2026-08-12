@@ -148,7 +148,7 @@ def main():
             "year": min_year,
             "area_ha": epoch_data[min_year]["area_ha"],
         },
-        "net_change_2007_to_2020": {
+        "net_change_2007_to_2022": {
             "delta_ha": net_change_ha,
             "delta_pct": net_change_pct,
         },
@@ -167,7 +167,7 @@ def main():
             "project": "MangroveSight",
             "region": "Teluk Balikpapan",
             "data_sources": {
-                "2007_2020": "Global Mangrove Watch v3.0 (Zenodo: 10.5281/zenodo.6894273)",
+                "2007_2022": "Global Mangrove Watch v3.0 (Zenodo: 10.5281/zenodo.6894273)",
             },
             "area_unit": "hectares (ha)",
             "crs_for_calculation": UTM_CRS,

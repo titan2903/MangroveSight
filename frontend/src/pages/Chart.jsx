@@ -94,7 +94,7 @@ const Chart = () => {
               variant="h6"
               sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 400, maxWidth: 600, fontSize: { xs: '0.95rem', md: '1.1rem' } }}
             >
-              Visualisasi komprehensif tren luas dan perubahan area mangrove di Teluk Balikpapan berdasarkan data <strong style={{ color: '#A5F3FC' }}>Global Mangrove Watch (2007–2020)</strong>.
+              Visualisasi komprehensif tren luas dan perubahan area mangrove di Teluk Balikpapan berdasarkan data <strong style={{ color: '#A5F3FC' }}>Global Mangrove Watch (2007–2022)</strong>.
             </Typography>
           </motion.div>
         </Container>

@@ -1,8 +1,8 @@
 # MangroveSight
 
-## WebGIS Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan (2007–2020)
+## WebGIS Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan (2007–2022)
 
-MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari Final Project Bootcamp WebGIS Batch 3 MAPID Academy. Proyek ini bertujuan untuk memvisualisasikan perubahan sebaran hutan mangrove di wilayah Teluk Balikpapan dari periode 2007 hingga 2020 secara interaktif dan komprehensif.
+MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari Final Project Bootcamp WebGIS Batch 3 MAPID Academy. Proyek ini bertujuan untuk memvisualisasikan perubahan sebaran hutan mangrove di wilayah Teluk Balikpapan dari periode 2007 hingga 2022 secara interaktif dan komprehensif.
 
 ### Tujuan Proyek
 - Menyajikan data spasial mangrove dalam bentuk peta interaktif (berbasis GeoJSON/PostGIS).
@@ -11,7 +11,7 @@ MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari F
 - Menyediakan asisten AI interaktif (didukung OpenRouter AI) untuk menjawab pertanyaan spesifik seputar analisis spasial dan statistik berdasarkan basis pengetahuan (*knowledge base*).
 
 ### Fitur Utama
-- **Interactive Web Map**: Eksplorasi spasial hutan mangrove dari berbagai rentang waktu (2007, 2010, 2015, 2020).
+- **Interactive Web Map**: Eksplorasi spasial hutan mangrove dari berbagai rentang waktu (2007, 2010, 2015, 2022).
 - **Mode Perbandingan (Change Detection)**: Menampilkan poligon selisih area (Pertumbuhan/Gain, Penurunan/Loss, dan Stabil) antara dua tahun berbeda menggunakan kalkulasi `ST_Difference` dan `ST_Intersection` tingkat *database* (PostGIS).
 - **Heatmap Kepadatan**: Menampilkan sebaran intensitas area mangrove untuk memvisualisasikan konsentrasi ekosistem yang paling padat menggunakan algoritma dinamis yang dirender menggunakan *Canvas* di Leaflet.
 - **Statistical Dashboard**: Menampilkan grafik (*bar chart*) tren total luas dan persentase perubahan area mangrove dari waktu ke waktu secara interaktif dengan komponen Recharts.

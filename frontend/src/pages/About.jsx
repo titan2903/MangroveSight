@@ -77,7 +77,7 @@ const About = () => {
                     Sumber Data (Global Mangrove Watch)
                   </Typography>
                   <Typography variant="body1" sx={{ color: '#455a64', lineHeight: 1.8 }}>
-                    Data set utama dalam platform ini menggunakan observasi citra satelit dari <strong>Global Mangrove Watch (GMW) v3.0</strong>. Dataset historis ini menutupi 10 epoch antara rentang waktu <strong>2007 hingga 2020</strong>. Data global mentah ini diproses (di-clip) menggunakan Python GDAL/Fiona untuk membatasi ruang lingkup observasi hanya pada *bounding box* Teluk Balikpapan demi efisiensi dan performa aplikasi.
+                    Data set utama dalam platform ini menggunakan observasi citra satelit dari <strong>Global Mangrove Watch (GMW) v3.0</strong>. Dataset historis ini menutupi 11 epoch antara rentang waktu <strong>2007 hingga 2022</strong>. Data global mentah ini diproses (di-clip) menggunakan Python GDAL/Fiona untuk membatasi ruang lingkup observasi hanya pada *bounding box* Teluk Balikpapan demi efisiensi dan performa aplikasi.
                   </Typography>
                 </Paper>
               </motion.div>

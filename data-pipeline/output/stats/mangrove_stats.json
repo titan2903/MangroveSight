@@ -3,7 +3,7 @@
     "project": "MangroveSight",
     "region": "Teluk Balikpapan",
     "data_sources": {
-      "2007_2020": "Global Mangrove Watch v3.0 (Zenodo: 10.5281/zenodo.6894273)"
+      "2007_2022": "Global Mangrove Watch v3.0 (Zenodo: 10.5281/zenodo.6894273)"
     },
     "area_unit": "hectares (ha)",
     "crs_for_calculation": "EPSG:32750",
@@ -30,7 +30,7 @@
       "year": 2017,
       "area_ha": 13276.49
     },
-    "net_change_2007_to_2020": {
+    "net_change_2007_to_2022": {
       "delta_ha": 1787.89,
       "delta_pct": 13.34
     },

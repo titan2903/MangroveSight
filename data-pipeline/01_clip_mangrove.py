@@ -2,7 +2,7 @@
 Script 01: Clip Mangrove Shapefiles to Teluk Balikpapan Bounding Box
 ===================================================================
 Sumber Data:
-  - GMW v3.0 (Epoch 2007-2020): https://zenodo.org/records/6894273
+  - GMW v3.0 (Epoch 2007-2022): https://zenodo.org/records/6894273
 
 Cara Penggunaan:
   1. Unduh file shapefile dari link di atas.

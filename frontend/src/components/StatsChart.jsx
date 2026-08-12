@@ -120,7 +120,7 @@ const StatsChart = ({ stats }) => {
   }));
 
   const summary = stats.summary || {};
-  const netDelta = summary.net_change_2007_to_2020?.delta_ha;
+  const netDelta = summary.net_change_2007_to_2022?.delta_ha;
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -154,9 +154,9 @@ const StatsChart = ({ stats }) => {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <SummaryCard
             label="Net Change"
-            year="2007–2020"
+            year="2007–2022"
             value={`${netDelta > 0 ? '+' : ''}${netDelta?.toLocaleString('id-ID', { maximumFractionDigits: 2 })}`}
-            unit={`hektar (${summary.net_change_2007_to_2020?.delta_pct}%)`}
+            unit={`hektar (${summary.net_change_2007_to_2022?.delta_pct}%)`}
             icon={SwapVertIcon}
             color={netDelta >= 0 ? '#1565C0' : '#6A1B9A'}
             bgColor="#EDE7F6"
