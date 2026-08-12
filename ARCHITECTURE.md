@@ -14,7 +14,7 @@ graph TD
     OSM["OSM / Satellite Basemaps"]
 
     %% Frontend (Netlify)
-    subgraph Frontend ["Frontend - React (Deployed on Netlify)"]
+    subgraph Frontend ["Frontend - React (Deployed on Vercel/Netlify)"]
         UI["React Router SPA"]
         Map["react-leaflet MapViewer"]
         Chart["Recharts DataViz"]
@@ -40,8 +40,8 @@ graph TD
 
     %% Data Pipeline (Offline)
     subgraph DataPipeline ["Offline Data Pipeline"]
-        RawData["Raw GMW Shapefiles"]
-        PythonScripts["Python + GDAL Scripts"]
+        RawData["Raw GMW Data (Shapefiles & GeoTIFF)"]
+        PythonScripts["Python + GDAL & Rasterio Scripts"]
     end
 
     %% Relationships
@@ -66,16 +66,16 @@ graph TD
 
 ### 2.1. Frontend (WebGIS Client)
 
-- **Tech Stack**: React JS, Vite, React Router v6.
+- **Tech Stack**: React JS, Vite, React Router v6, ESLint, Prettier.
 - **Responsibility**: Provides the user interface, renders interactive maps, displays statistical charts, and handles user interactions.
 - **Key Libraries**:
   - `react-leaflet`: Renders the map and GeoJSON layers.
   - `recharts`: Visualizes mangrove area trends and changes.
-- **Hosting**: Netlify.
+- **Hosting**: Vercel (Primary) & Netlify (Backup).
 
 ### 2.2. Backend (API & AI Proxy)
 
-- **Tech Stack**: Python, FastAPI.
+- **Tech Stack**: Python, FastAPI, Ruff.
 - **Responsibility**: Serves geospatial data to the map, provides statistical data to the charts, and securely acts as a proxy for the AI assistant.
 - **Key Endpoints**:
   - `GET /api/mangrove?year=YYYY`: Returns spatial boundaries as GeoJSON.
@@ -91,14 +91,15 @@ graph TD
 
 ### 2.4. Data Pipeline (Offline Preprocessing)
 
-- **Tech Stack**: QGIS, Python, GDAL.
-- **Responsibility**: A set of scripts that runs offline before deployment. It clips the global GMW data to the Teluk Balikpapan bounding box, calculates area (ha) and delta changes between epochs, exports statistics as JSON, and pushes the spatial data to PostGIS.
+- **Tech Stack**: QGIS, Python, GDAL, Rasterio.
+- **Responsibility**: A set of scripts that runs offline before deployment. It extracts and clips global GMW data (Shapefiles for 2007-2020 and GeoTIFF raster for 2022) to the Teluk Balikpapan bounding box, calculates area (ha) and delta changes between epochs, exports statistics as JSON, and pushes the spatial data to PostGIS.
 
 ## 3. Deployment & CI/CD
 
 - **GitHub Actions** is used as the CI/CD orchestrator.
 - **Frontend Pipeline (`netlify-deploy.yml`)**: Triggered on push to `master`. Builds the Vite project and deploys the `dist/` folder to Netlify.
-- **Backup Frontend Pipeline (`vercel-deploy.yml`)**: Serves as a backup deployment to Vercel if Netlify limits are exceeded.
+- **Primary Frontend Pipeline (`vercel-deploy.yml`)**: Deploys the frontend to Vercel (configured with custom vercel.json to avoid CORS issues).
+- **Backup Frontend Pipeline (`netlify-deploy.yml`)**: Serves as a fallback deployment to Netlify.
 - **Backend Pipeline (`heroku-deploy.yml`)**: Triggered on push to `master`. Deploys the FastAPI code to Heroku.
 - **Secrets Management**: GitHub Secrets hold the deploy tokens (`NETLIFY_AUTH_TOKEN`, `HEROKU_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`). Application secrets (like `OPENROUTER_API_KEY` dan `DATABASE_URL`) are stored in Heroku's Config Vars, never in the frontend or source code.
 

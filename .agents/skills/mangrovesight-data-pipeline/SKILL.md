@@ -13,7 +13,7 @@ The pipeline consists of **3 sequential scripts** that must be run in order:
 
 | Step | Script | Input | Output |
 |------|--------|-------|--------|
-| 01 | `01_clip_mangrove.py` | GMW Shapefiles (`.shp`) in `input/` | `output/clipped/mangrove_{year}.geojson` |
+| 01 | `01_clip_mangrove.py` (Shapefiles) / `01b_process_tif.py` (GeoTIFF) | GMW Shapefiles (`.shp`) in `input/` | `output/clipped/mangrove_{year}.geojson` |
 | 02 | `02_precompute_stats.py` | `output/clipped/*.geojson` | `output/stats/mangrove_stats.json` |
 | 03 | `03_import_to_postgis.py` | `output/clipped/*.geojson` + `backend/.env` | Rows in PostgreSQL table `mangrove_extents` |
 

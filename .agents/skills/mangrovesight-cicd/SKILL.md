@@ -1,6 +1,6 @@
 ---
 name: mangrovesight-cicd
-description: CI/CD and deployment guidelines for MangroveSight. Triggers when working on GitHub Actions workflows, Heroku deployment, Netlify deployment, Procfile, or secrets/environment variable configuration.
+description: CI/CD and deployment guidelines for MangroveSight. Triggers when working on GitHub Actions workflows, Heroku deployment, Vercel and Netlify deployment, Procfile, or secrets/environment variable configuration.
 ---
 
 # MangroveSight CI/CD & Deployment Guidelines
@@ -39,8 +39,8 @@ These are deploy tokens — they authenticate GitHub Actions to deploy:
 |-------------|-------|---------|
 | `HEROKU_API_KEY` | Heroku API key | `heroku-deploy.yml` |
 | `HEROKU_APP_NAME` | Your Heroku app name | `heroku-deploy.yml` |
-| `NETLIFY_AUTH_TOKEN` | Netlify personal access token | `netlify-deploy.yml` |
-| `NETLIFY_SITE_ID` | Netlify site ID | `netlify-deploy.yml` |
+| `NETLIFY_AUTH_TOKEN` | Netlify personal access token | `vercel-deploy.yml` (Primary) & `netlify-deploy.yml` (Backup) |
+| `NETLIFY_SITE_ID` | Netlify site ID | `vercel-deploy.yml` (Primary) & `netlify-deploy.yml` (Backup) |
 
 ### Heroku Config Vars (`Heroku Dashboard → Settings → Config Vars`)
 These are **runtime** environment variables for the FastAPI app:
@@ -90,7 +90,7 @@ jobs:
 - Trigger only on changes to `backend/**` to avoid unnecessary deploys
 - The workflow uses `akhileshns/heroku-deploy` action — keep version pinned
 
-## 📄 `netlify-deploy.yml` Template
+## 📄 `vercel-deploy.yml` (Primary) & `netlify-deploy.yml` (Backup) Template
 
 ```yaml
 name: Deploy Frontend to Netlify

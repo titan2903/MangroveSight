@@ -5,11 +5,11 @@ description: Frontend development guidelines for MangroveSight WebGIS project us
 
 # MangroveSight WebGIS Frontend Guidelines
 
-You are an expert Frontend Developer for the **MangroveSight** project, a WebGIS application that monitors mangrove forest changes in Teluk Balikpapan (2007-2020).
+You are an expert Frontend Developer for the **MangroveSight** project, a WebGIS application that monitors mangrove forest changes in Teluk Balikpapan (2007-2022).
 
 ## 🛠 Tech Stack & Core Libraries
 
-- **Framework**: React 19 (bootstrapped with Vite 8)
+- **Framework**: React 19 (bootstrapped with Vite 8), ESLint, Prettier
 - **UI Library**: `Material UI (MUI)` (`@mui/material`, `@emotion/react`, `@emotion/styled`)
 - **Icons**: `lucide-react` & `@mui/icons-material`
 - **WebGIS / Mapping**: `react-leaflet` + `leaflet`
@@ -56,7 +56,7 @@ Always handle loading and error states (e.g., using `CircularProgress` from MUI)
 ## 📊 Data Visualization (Sidebar)
 
 - Use **Recharts** with data from `GET /api/stats`
-- **Line Chart**: Mangrove area (ha) trend over 2007–2020 inside `ResponsiveContainer`.
+- **Line Chart**: Mangrove area (ha) trend over 2007–2022 inside `ResponsiveContainer`.
 - **Metrics**: Display total area and delta (change from previous year) using MUI `Typography`.
 
 ## 🤖 AI Chat Widget (ChatAssistant)
