@@ -13,3 +13,6 @@ shapely
 
 # AI Integration
 openai
+
+# Linter and Formatter
+ruff

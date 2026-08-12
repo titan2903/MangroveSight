@@ -1,11 +1,13 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 from typing import Any
+
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
 
 def get_mangrove_geojson_from_db(year: int, db: Session, simplify: bool = False) -> Any:
     # If simplify is True, we use ST_Simplify with 0.0005 degrees tolerance (~50 meters)
     geometry_expr = "ST_Simplify(geometry, 0.0005)" if simplify else "geometry"
-    
+
     query = text(f"""
         SELECT jsonb_build_object(
             'type',     'FeatureCollection',
@@ -23,13 +25,16 @@ def get_mangrove_geojson_from_db(year: int, db: Session, simplify: bool = False)
     """)
     return db.execute(query, {"year": year}).scalar()
 
-def get_mangrove_comparison(year1: int, year2: int, db: Session, simplify: bool = False) -> Any:
+
+def get_mangrove_comparison(
+    year1: int, year2: int, db: Session, simplify: bool = False
+) -> Any:
     # Uses ST_Difference and ST_Intersection to find loss, gain, and stable areas
     # Returns a GeoJSON FeatureCollection
-    
+
     # Simplify geometry directly in CTEs to make ST_Difference and ST_Intersection much faster
     geometry_expr = "ST_Simplify(geometry, 0.0005)" if simplify else "geometry"
-    
+
     query = text(f"""
         WITH y1 AS (
             SELECT ST_Union({geometry_expr}) as geom FROM mangrove_extents WHERE year = :year1
@@ -60,6 +65,7 @@ def get_mangrove_comparison(year1: int, year2: int, db: Session, simplify: bool 
         FROM y1, y2;
     """)
     return db.execute(query, {"year1": year1, "year2": year2}).scalar()
+
 
 def get_heatmap_points(year: int, db: Session) -> Any:
     # Returns an array of [lat, lng, intensity] for leafet.heat

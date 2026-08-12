@@ -1,23 +1,42 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap, LayersControl, ScaleControl, ZoomControl } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { Box, Typography, Chip, Fade, Tooltip } from '@mui/material';
-import * as L from 'leaflet';
-import ForestIcon from '@mui/icons-material/Forest';
-import SatelliteIcon from '@mui/icons-material/Satellite';
-import LayersIcon from '@mui/icons-material/Layers';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import HeatmapLayer from './HeatmapLayer';
-import html2canvas from 'html2canvas';
-import { IconButton } from '@mui/material';
+import { useEffect, useState, useRef, useCallback } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  LayersControl,
+  ScaleControl,
+  ZoomControl,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { Box, Typography, Chip, Fade, Tooltip } from "@mui/material";
+import * as L from "leaflet";
+import ForestIcon from "@mui/icons-material/Forest";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import HeatmapLayer from "./HeatmapLayer";
+import html2canvas from "html2canvas";
+import { IconButton } from "@mui/material";
 
 const { BaseLayer } = LayersControl;
 
-import { FitBounds, ZoomListener, CoordinateDisplay, MinimapSync, getAreaHa } from './MapHelpers';
-
+import {
+  FitBounds,
+  ZoomListener,
+  CoordinateDisplay,
+  MinimapSync,
+  getAreaHa,
+} from "./MapHelpers";
 
 // ─── Main Component ──────────────────────────────────────────────────────
-const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear, compareMode, onZoomChange }) => {
+const MapViewer = ({
+  data,
+  compareData,
+  heatmapData,
+  loading,
+  year,
+  compareYear,
+  compareMode,
+  onZoomChange,
+}) => {
   const [showYearBadge, setShowYearBadge] = useState(false);
   const [clickedInfo, setClickedInfo] = useState(null);
   const [parentMap, setParentMap] = useState(null);
@@ -37,22 +56,25 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
   const handleScreenshot = () => {
     setIsCapturing(true);
     setTimeout(() => {
-      const mapElement = document.getElementById('map-capture-area');
+      const mapElement = document.getElementById("map-capture-area");
       if (mapElement) {
-        html2canvas(mapElement, { 
+        html2canvas(mapElement, {
           useCORS: true,
           allowTaint: true,
-          ignoreElements: (node) => node.classList && node.classList.contains('no-capture')
-        }).then((canvas) => {
-          const link = document.createElement('a');
-          link.download = `MangroveSight_${year}.png`;
-          link.href = canvas.toDataURL();
-          link.click();
-          setIsCapturing(false);
-        }).catch(err => {
-          console.error("Screenshot error:", err);
-          setIsCapturing(false);
-        });
+          ignoreElements: (node) =>
+            node.classList && node.classList.contains("no-capture"),
+        })
+          .then((canvas) => {
+            const link = document.createElement("a");
+            link.download = `MangroveSight_${year}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            setIsCapturing(false);
+          })
+          .catch((err) => {
+            console.error("Screenshot error:", err);
+            setIsCapturing(false);
+          });
       } else {
         setIsCapturing(false);
       }
@@ -62,56 +84,85 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
   // Dismiss popup on map click (via key)
   const handleMapClick = () => setClickedInfo(null);
 
-  const onEachFeature = useCallback((feature, layer) => {
-    const area = getAreaHa(feature);
-    const status = feature.properties?.status;
-    const baseColor = feature.properties?.color || '#00BFA5';
-    const statusLabel = feature.properties?.desc ? `Status: <b>${feature.properties.desc}</b><br/>` : '';
+  const onEachFeature = useCallback(
+    (feature, layer) => {
+      const area = getAreaHa(feature);
+      const status = feature.properties?.status;
+      const baseColor = feature.properties?.color || "#00BFA5";
+      const statusLabel = feature.properties?.desc
+        ? `Status: <b>${feature.properties.desc}</b><br/>`
+        : "";
 
-    const tooltipHtml = `
+      const tooltipHtml = `
       <div style="text-align:center; font-family:'Inter',sans-serif; min-width:130px;">
         <div style="color:#004D40; font-weight:700; font-size:0.9rem; margin-bottom:4px;">🌿 Mangrove Patch</div>
         <div style="font-size:0.8rem; color:#555;">Tahun: <b>${compareMode ? `${year} vs ${compareYear}` : year}</b></div>
         ${statusLabel}
-        ${area !== '—' && !compareMode ? `<div style="font-size:0.8rem; color:#555;">Luas: <b>${Number(area).toFixed(2)} ha</b></div>` : ''}
+        ${area !== "—" && !compareMode ? `<div style="font-size:0.8rem; color:#555;">Luas: <b>${Number(area).toFixed(2)} ha</b></div>` : ""}
       </div>
     `;
-    layer.bindTooltip(tooltipHtml, { sticky: true, className: 'custom-tooltip', offset: [15, 0] });
+      layer.bindTooltip(tooltipHtml, {
+        sticky: true,
+        className: "custom-tooltip",
+        offset: [15, 0],
+      });
 
-    layer.on({
-      mouseover: (e) => {
-        e.target.setStyle({ weight: 3, color: '#FFFFFF', fillColor: baseColor, fillOpacity: 0.9 });
-      },
-      mouseout: (e) => {
-        e.target.setStyle({ weight: 1, color: baseColor, fillColor: baseColor, fillOpacity: compareMode ? 0.8 : 0.6 });
-      },
-      click: (e) => {
-        const target = e.target;
-        const map = target._map;
-        
-        try {
-          if (typeof target.getBounds === 'function') {
-            map.flyToBounds(target.getBounds(), { padding: [80, 80], duration: 1.2, easeLinearity: 0.25 });
-          } else if (typeof target.getLatLng === 'function') {
-            // For Point geometries (Leaflet Markers), getBounds() doesn't exist. Fly to the point instead.
-            map.flyTo(target.getLatLng(), 15, { duration: 1.2, easeLinearity: 0.25 });
+      layer.on({
+        mouseover: (e) => {
+          e.target.setStyle({
+            weight: 3,
+            color: "#FFFFFF",
+            fillColor: baseColor,
+            fillOpacity: 0.9,
+          });
+        },
+        mouseout: (e) => {
+          e.target.setStyle({
+            weight: 1,
+            color: baseColor,
+            fillColor: baseColor,
+            fillOpacity: compareMode ? 0.8 : 0.6,
+          });
+        },
+        click: (e) => {
+          const target = e.target;
+          const map = target._map;
+
+          try {
+            if (typeof target.getBounds === "function") {
+              map.flyToBounds(target.getBounds(), {
+                padding: [80, 80],
+                duration: 1.2,
+                easeLinearity: 0.25,
+              });
+            } else if (typeof target.getLatLng === "function") {
+              // For Point geometries (Leaflet Markers), getBounds() doesn't exist. Fly to the point instead.
+              map.flyTo(target.getLatLng(), 15, {
+                duration: 1.2,
+                easeLinearity: 0.25,
+              });
+            }
+          } catch (error) {
+            console.warn("Could not zoom to feature:", error);
           }
-        } catch (error) {
-          console.warn("Could not zoom to feature:", error);
-        }
-        
-        setClickedInfo({ lat: e.latlng.lat, lng: e.latlng.lng, area });
-      }
-    });
-  }, [year, compareYear, compareMode]);
+
+          setClickedInfo({ lat: e.latlng.lat, lng: e.latlng.lng, area });
+        },
+      });
+    },
+    [year, compareYear, compareMode],
+  );
 
   return (
-    <Box id="map-capture-area" sx={{ height: '100%', width: '100%', position: 'relative' }} onClick={handleMapClick}>
+    <Box
+      id="map-capture-area"
+      sx={{ height: "100%", width: "100%", position: "relative" }}
+      onClick={handleMapClick}
+    >
       <MapContainer
-
         center={[-1.2, 116.8]}
         zoom={10}
-        style={{ height: '100%', width: '100%', zIndex: 0 }}
+        style={{ height: "100%", width: "100%", zIndex: 0 }}
         zoomControl={false}
         zoomAnimation={true}
         fadeAnimation={true}
@@ -155,43 +206,43 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
             key={`data-${year}-${data.features?.length || 0}`}
             data={data}
             style={{
-              color: '#00BFA5',
+              color: "#00BFA5",
               weight: 1,
-              fillColor: '#00BFA5',
+              fillColor: "#00BFA5",
               fillOpacity: 0.6,
             }}
             onEachFeature={onEachFeature}
             pointToLayer={(feature, latlng) => {
               return L.circleMarker(latlng, {
                 radius: 5,
-                color: '#FFFFFF',
+                color: "#FFFFFF",
                 weight: 1,
-                fillColor: '#00BFA5',
-                fillOpacity: 0.8
+                fillColor: "#00BFA5",
+                fillOpacity: 0.8,
               });
             }}
           />
         )}
-        
+
         {compareData && compareMode && (
           <GeoJSON
             key={`compare-${year}-${compareYear}-${compareData.features?.length || 0}`}
             data={compareData}
             style={(feature) => ({
-              color: feature.properties.color || '#00BFA5',
+              color: feature.properties.color || "#00BFA5",
               weight: 1,
-              fillColor: feature.properties.color || '#00BFA5',
+              fillColor: feature.properties.color || "#00BFA5",
               fillOpacity: 0.8,
             })}
             onEachFeature={onEachFeature}
             pointToLayer={(feature, latlng) => {
-              const baseColor = feature.properties?.color || '#00BFA5';
+              const baseColor = feature.properties?.color || "#00BFA5";
               return L.circleMarker(latlng, {
                 radius: 5,
-                color: '#FFFFFF',
+                color: "#FFFFFF",
                 weight: 1,
                 fillColor: baseColor,
-                fillOpacity: 0.9
+                fillOpacity: 0.9,
               });
             }}
           />
@@ -204,31 +255,46 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
 
       {/* ── Animated Year Badge ──────────────────────────── */}
       <Fade in={showYearBadge} timeout={{ enter: 400, exit: 1000 }}>
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 900,
-          pointerEvents: 'none',
-        }}>
-          <Box sx={{
-            background: 'linear-gradient(135deg, rgba(0,77,64,0.9) 0%, rgba(0,191,165,0.9) 100%)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
-            borderRadius: 4,
-            px: 5, py: 2,
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(0,77,64,0.5)',
-            animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-          }}>
-            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.7)', letterSpacing: 3 }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 900,
+            pointerEvents: "none",
+          }}
+        >
+          <Box
+            sx={{
+              background:
+                "linear-gradient(135deg, rgba(0,77,64,0.9) 0%, rgba(0,191,165,0.9) 100%)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.3)",
+              borderRadius: 4,
+              px: 5,
+              py: 2,
+              textAlign: "center",
+              boxShadow: "0 8px 32px rgba(0,77,64,0.5)",
+              animation: "popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            }}
+          >
+            <Typography
+              variant="overline"
+              sx={{ color: "rgba(255,255,255,0.7)", letterSpacing: 3 }}
+            >
               TUTUPAN MANGROVE
             </Typography>
-            <Typography variant="h2" sx={{ color: '#fff', fontWeight: 900, lineHeight: 1, my: 0.5 }}>
+            <Typography
+              variant="h2"
+              sx={{ color: "#fff", fontWeight: 900, lineHeight: 1, my: 0.5 }}
+            >
               {compareMode ? `${year} vs ${compareYear}` : year}
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.75)' }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "rgba(255,255,255,0.75)" }}
+            >
               Teluk Balikpapan
             </Typography>
           </Box>
@@ -236,45 +302,100 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
       </Fade>
 
       {/* ── Gradient Legends ──────────────────────────────── */}
-      <Box sx={{
-        position: 'absolute',
-        bottom: 110,
-        right: 20,
-        zIndex: 1000,
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(8px)',
-        borderRadius: 2,
-        p: 1.5,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        minWidth: 150,
-      }}>
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 110,
+          right: 20,
+          zIndex: 1000,
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(8px)",
+          borderRadius: 2,
+          p: 1.5,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          minWidth: 150,
+        }}
+      >
         {heatmapData ? (
           <>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: '#004D40', display: 'block', mb: 0.5 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                color: "#004D40",
+                display: "block",
+                mb: 0.5,
+              }}
+            >
               🔥 Kepadatan Mangrove
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ 
-                width: 120, height: 10, borderRadius: 5, 
-                background: 'linear-gradient(90deg, #0d47a1 0%, #0288d1 30%, #00bfa5 50%, #f9a825 70%, #e53935 90%, #b71c1c 100%)' 
-              }} />
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 120,
+                  height: 10,
+                  borderRadius: 5,
+                  background:
+                    "linear-gradient(90deg, #0d47a1 0%, #0288d1 30%, #00bfa5 50%, #f9a825 70%, #e53935 90%, #b71c1c 100%)",
+                }}
+              />
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.3 }}>
-              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Rendah</Typography>
-              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Tinggi</Typography>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 0.3 }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#777", fontSize: "0.65rem" }}
+              >
+                Rendah
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "#777", fontSize: "0.65rem" }}
+              >
+                Tinggi
+              </Typography>
             </Box>
           </>
         ) : (
           <>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: '#004D40', display: 'block', mb: 0.5 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                color: "#004D40",
+                display: "block",
+                mb: 0.5,
+              }}
+            >
               🌿 Tutupan Mangrove
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 100, height: 10, borderRadius: 5, background: 'linear-gradient(90deg, rgba(0,191,165,0.2), rgba(0,191,165,1))' }} />
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 100,
+                  height: 10,
+                  borderRadius: 5,
+                  background:
+                    "linear-gradient(90deg, rgba(0,191,165,0.2), rgba(0,191,165,1))",
+                }}
+              />
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.3 }}>
-              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Jarang</Typography>
-              <Typography variant="caption" sx={{ color: '#777', fontSize: '0.65rem' }}>Padat</Typography>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 0.3 }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#777", fontSize: "0.65rem" }}
+              >
+                Jarang
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "#777", fontSize: "0.65rem" }}
+              >
+                Padat
+              </Typography>
             </Box>
           </>
         )}
@@ -282,24 +403,34 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
           <Chip
             label={`${year}`}
             size="small"
-            sx={{ mt: 1, bgcolor: '#004D40', color: 'white', fontWeight: 700, width: '100%', fontSize: '0.75rem' }}
+            sx={{
+              mt: 1,
+              bgcolor: "#004D40",
+              color: "white",
+              fontWeight: 700,
+              width: "100%",
+              fontSize: "0.75rem",
+            }}
           />
         )}
       </Box>
 
       {/* ── Minimap (Overview Map) ────────────────────────── */}
-      <Box className="no-capture" sx={{
-        position: 'absolute',
-        bottom: 30,
-        left: 390,
-        width: 150,
-        height: 150,
-        zIndex: 1000,
-        border: '3px solid white',
-        borderRadius: 2,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        overflow: 'hidden'
-      }}>
+      <Box
+        className="no-capture"
+        sx={{
+          position: "absolute",
+          bottom: 30,
+          left: 390,
+          width: 150,
+          height: 150,
+          zIndex: 1000,
+          border: "3px solid white",
+          borderRadius: 2,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          overflow: "hidden",
+        }}
+      >
         <MapContainer
           center={[-1.2, 116.8]}
           zoom={5}
@@ -308,41 +439,52 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
           dragging={false}
           doubleClickZoom={false}
           touchZoom={false}
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: "100%", width: "100%" }}
         >
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
           {/* Rectangle roughly covering Balikpapan Bay area */}
-          <GeoJSON 
+          <GeoJSON
             data={{
               type: "Feature",
               properties: {},
               geometry: {
                 type: "Polygon",
-                coordinates: [[[116.7, -1.1], [117.1, -1.1], [117.1, -1.6], [116.7, -1.6], [116.7, -1.1]]]
-              }
-            }} 
-            style={{ color: '#00BFA5', weight: 2, fillOpacity: 0 }}
+                coordinates: [
+                  [
+                    [116.7, -1.1],
+                    [117.1, -1.1],
+                    [117.1, -1.6],
+                    [116.7, -1.6],
+                    [116.7, -1.1],
+                  ],
+                ],
+              },
+            }}
+            style={{ color: "#00BFA5", weight: 2, fillOpacity: 0 }}
           />
           <MinimapSync parentMap={parentMap} />
         </MapContainer>
       </Box>
 
       {/* ── Screenshot Button ─────────────────────────────── */}
-      <Box className="no-capture" sx={{
-        position: 'absolute',
-        top: 20,
-        right: 70, // right of zoom control
-        zIndex: 1000,
-      }}>
+      <Box
+        className="no-capture"
+        sx={{
+          position: "absolute",
+          top: 20,
+          right: 70, // right of zoom control
+          zIndex: 1000,
+        }}
+      >
         <Tooltip title="Capture Map" placement="left">
           <IconButton
             onClick={handleScreenshot}
             disabled={isCapturing}
             sx={{
-              bgcolor: 'rgba(255,255,255,0.9)',
-              color: '#004D40',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              '&:hover': { bgcolor: '#fff' }
+              bgcolor: "rgba(255,255,255,0.9)",
+              color: "#004D40",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              "&:hover": { bgcolor: "#fff" },
             }}
           >
             <CameraAltIcon />
@@ -350,44 +492,76 @@ const MapViewer = ({ data, compareData, heatmapData, loading, year, compareYear,
         </Tooltip>
       </Box>
 
-
       {/* ── Premium Glassmorphism Loading Overlay ─────────── */}
       <Fade in={loading} timeout={300}>
-        <Box sx={{
-          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-          background: 'radial-gradient(ellipse at center, rgba(0,77,64,0.2) 0%, rgba(255,255,255,0.5) 100%)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-          zIndex: 1000,
-        }}>
-          <Box sx={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            background: 'rgba(255,255,255,0.8)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(0,191,165,0.3)',
-            borderRadius: 4, px: 5, py: 4,
-            boxShadow: '0 8px 32px rgba(0,77,64,0.2)'
-          }}>
-            <Box sx={{ position: 'relative', width: 70, height: 70, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Box sx={{
-                position: 'absolute', width: '100%', height: '100%', borderRadius: '50%',
-                border: '3px solid transparent',
-                borderTopColor: '#00BFA5', borderRightColor: '#004D40',
-                animation: 'spin 1s linear infinite'
-              }} />
-              <ForestIcon sx={{ fontSize: 32, color: '#004D40' }} />
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background:
+              "radial-gradient(ellipse at center, rgba(0,77,64,0.2) 0%, rgba(255,255,255,0.5) 100%)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              background: "rgba(255,255,255,0.8)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(0,191,165,0.3)",
+              borderRadius: 4,
+              px: 5,
+              py: 4,
+              boxShadow: "0 8px 32px rgba(0,77,64,0.2)",
+            }}
+          >
+            <Box
+              sx={{
+                position: "relative",
+                width: 70,
+                height: 70,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "50%",
+                  border: "3px solid transparent",
+                  borderTopColor: "#00BFA5",
+                  borderRightColor: "#004D40",
+                  animation: "spin 1s linear infinite",
+                }}
+              />
+              <ForestIcon sx={{ fontSize: 32, color: "#004D40" }} />
             </Box>
-            <Typography variant="subtitle1" sx={{ color: '#004D40', fontWeight: 700 }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ color: "#004D40", fontWeight: 700 }}
+            >
               Memuat Data {year}...
             </Typography>
-            <Typography variant="caption" sx={{ color: '#888' }}>
+            <Typography variant="caption" sx={{ color: "#888" }}>
               Mengambil geometri spasial mangrove
             </Typography>
           </Box>
         </Box>
       </Fade>
-
-
     </Box>
   );
 };

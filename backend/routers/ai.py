@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException, Request, Depends
+import time
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+
 from schemas import AskRequest
 from services import ai_service
-import time
 
 router = APIRouter()
 
@@ -10,19 +12,26 @@ RATE_LIMIT = 20
 RATE_LIMIT_WINDOW = 60
 request_history = {}
 
+
 def check_rate_limit(req: Request):
     client_ip = req.client.host
     current_time = time.time()
-    
+
     if client_ip not in request_history:
         request_history[client_ip] = []
-    
-    request_history[client_ip] = [ts for ts in request_history[client_ip] if current_time - ts < RATE_LIMIT_WINDOW]
-    
+
+    request_history[client_ip] = [
+        ts for ts in request_history[client_ip] if current_time - ts < RATE_LIMIT_WINDOW
+    ]
+
     if len(request_history[client_ip]) >= RATE_LIMIT:
-        raise HTTPException(status_code=429, detail="Too Many Requests. Please try again later (limit: 20 req/min).")
-    
+        raise HTTPException(
+            status_code=429,
+            detail="Too Many Requests. Please try again later (limit: 20 req/min).",
+        )
+
     request_history[client_ip].append(current_time)
+
 
 @router.post("/", dependencies=[Depends(check_rate_limit)])
 def ask_ai(request: AskRequest):

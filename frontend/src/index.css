@@ -1,10 +1,12 @@
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-family: "Inter", "Roboto", "Helvetica", "Arial", sans-serif;
 }
 
 /* Ensure Leaflet controls don't overlap our MUI components ungracefully */
@@ -18,5 +20,5 @@ html, body, #root {
   background-color: rgba(255, 255, 255, 0.9) !important;
   border-radius: 8px !important;
   border: 1px solid #e0e0e0 !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }

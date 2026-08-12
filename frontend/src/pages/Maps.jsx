@@ -1,9 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Box } from '@mui/material';
-import MapViewer from '../components/MapViewer';
-import Sidebar from '../components/Sidebar';
-import ChatAssistant from '../components/ChatAssistant';
-import { fetchAvailableYears, fetchStats, fetchMangroveGeoJSON, fetchMangroveComparison, fetchMangroveHeatmap } from '../api';
+import { useState, useEffect, useCallback } from "react";
+import { Box } from "@mui/material";
+import MapViewer from "../components/MapViewer";
+import Sidebar from "../components/Sidebar";
+import ChatAssistant from "../components/ChatAssistant";
+import {
+  fetchAvailableYears,
+  fetchStats,
+  fetchMangroveGeoJSON,
+  fetchMangroveComparison,
+  fetchMangroveHeatmap,
+} from "../api";
 
 const Maps = () => {
   const [years, setYears] = useState([]);
@@ -19,7 +25,7 @@ const Maps = () => {
   const [heatmapData, setHeatmapData] = useState(null);
 
   const [mapLoading, setMapLoading] = useState(false);
-  
+
   // Disable simplification to avoid loading screens on zoom
   const [simplifyGeoJSON, setSimplifyGeoJSON] = useState(false);
 
@@ -52,11 +58,18 @@ const Maps = () => {
       setMapLoading(true);
       try {
         if (compareMode && compareYear) {
-          const compData = await fetchMangroveComparison(selectedYear, compareYear, simplifyGeoJSON);
+          const compData = await fetchMangroveComparison(
+            selectedYear,
+            compareYear,
+            simplifyGeoJSON,
+          );
           setCompareData(compData);
           setGeoData(null);
         } else {
-          const data = await fetchMangroveGeoJSON(selectedYear, simplifyGeoJSON);
+          const data = await fetchMangroveGeoJSON(
+            selectedYear,
+            simplifyGeoJSON,
+          );
           setGeoData(data);
           setCompareData(null);
         }
@@ -83,7 +96,15 @@ const Maps = () => {
   }, []);
 
   return (
-    <Box sx={{ width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden', position: 'relative', display: 'flex' }}>
+    <Box
+      sx={{
+        width: "100%",
+        height: "calc(100vh - 64px)",
+        overflow: "hidden",
+        position: "relative",
+        display: "flex",
+      }}
+    >
       <Sidebar
         years={years}
         selectedYear={selectedYear}
@@ -100,8 +121,8 @@ const Maps = () => {
         geoData={geoData}
         compareData={compareData}
       />
-      
-      <Box sx={{ flexGrow: 1, height: '100%', position: 'relative' }}>
+
+      <Box sx={{ flexGrow: 1, height: "100%", position: "relative" }}>
         <MapViewer
           data={geoData}
           compareData={compareData}

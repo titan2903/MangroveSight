@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from routers import ai, mangrove, stats
 from settings import settings
-from routers import mangrove, stats, ai
 
 tags_metadata = [
     {
@@ -32,7 +33,7 @@ serta asisten AI yang dapat menjawab pertanyaan seputar data tersebut.
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_tags=tags_metadata
+    openapi_tags=tags_metadata,
 )
 
 app.add_middleware(
@@ -47,12 +48,13 @@ app.include_router(mangrove.router, prefix="/api/mangrove", tags=["Mangrove"])
 app.include_router(stats.router, prefix="/api/stats", tags=["Statistics"])
 app.include_router(ai.router, prefix="/api/ask", tags=["AI"])
 
+
 @app.get("/", tags=["Health"])
 def health_check():
     """
     Endpoint untuk mengecek status kesehatan API (Health Check).
     """
     return {
-        "status": "ok", 
-        "message": "MangroveSight API is healthy and running smoothly."
+        "status": "ok",
+        "message": "MangroveSight API is healthy and running smoothly.",
     }

@@ -1,12 +1,12 @@
-import L from 'leaflet';
+import L from "leaflet";
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.L = window.L || L;
 
   // 1. Patch Canvas getContext to suppress the "willReadFrequently" warning from leaflet-heat
   const originalGetContext = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function (contextId, options) {
-    if (contextId === '2d') {
+    if (contextId === "2d") {
       options = options || {};
       options.willReadFrequently = true;
     }

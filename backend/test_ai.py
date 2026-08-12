@@ -1,4 +1,3 @@
-import asyncio
 from services.ai_service import ask_assistant
 
 try:
