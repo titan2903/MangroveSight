@@ -204,7 +204,7 @@ const MapViewer = ({
           <BaseLayer name="🛰️ Satellite (Esri)">
             <TileLayer
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+              attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
             />
           </BaseLayer>
           <BaseLayer name="🌙 Dark Mode">
@@ -223,8 +223,9 @@ const MapViewer = ({
 
         {data && !compareMode && (
           <GeoJSON
-            key={`data-${year}-${data.features?.length || 0}`}
+            key={`geojson-${year}-${data.features?.length || 0}`}
             data={data}
+            attribution='&copy; <a href="https://www.globalmangrovewatch.org/">Global Mangrove Watch</a> | MAPID'
             style={{
               color: "#00BFA5",
               weight: 1,
@@ -248,6 +249,7 @@ const MapViewer = ({
           <GeoJSON
             key={`compare-${year}-${compareYear}-${compareData.features?.length || 0}`}
             data={compareData}
+            attribution='&copy; <a href="https://www.globalmangrovewatch.org/">Global Mangrove Watch</a> | MAPID'
             style={(feature) => ({
               color: feature.properties.color || "#00BFA5",
               weight: 1,
