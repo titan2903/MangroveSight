@@ -25,7 +25,7 @@ MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari F
 - **Sumber Data**: Global Mangrove Watch (GMW v3).
 
 ### Struktur Repository
-- `data-pipeline/`: Skrip Python untuk memotong (*clip*) raw data GMW secara spesifik ke area *Bounding Box* Teluk Balikpapan, menghitung luasan statistik, dan mengimpor spasial ke tabel PostGIS.
+- `data-pipeline/`: Skrip Python untuk memotong (*clip*) raw data GMW secara spesifik ke area *Bounding Box* Teluk Balikpapan, menghitung luasan statistik, dan mengimpor spasial ke tabel PostGIS. **(Hanya untuk penggunaan lokal/development)**
 - `backend/`: Server API (*Clean Architecture*) yang menyediakan *endpoints* GeoJSON spasial, endpoint analitik on-the-fly (Heatmap, Compare), serta merutekan interaksi Chat AI ke OpenRouter.
 - `frontend/`: Aplikasi web interaktif bergaya modern (*Glassmorphism*, nuansa alam hijau/teal) yang di-build menggunakan Vite.
 - `.github/workflows/`: Skrip CI/CD GitHub Actions untuk *auto-deploy* ke Netlify (Frontend), Heroku (Backend), dan Vercel (Backup Frontend).
