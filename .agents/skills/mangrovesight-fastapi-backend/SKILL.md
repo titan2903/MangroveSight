@@ -14,7 +14,7 @@ You are an expert Backend Developer for the **MangroveSight** project. The backe
 - **ORM / DB Driver**: `SQLAlchemy` (synchronous) + `psycopg2-binary` driver + `GeoAlchemy2` for spatial types
   - **Do NOT use `asyncpg`** — the project uses synchronous SQLAlchemy (`create_engine`, not `create_async_engine`)
 - **Migrations**: `alembic` — use for any schema changes to the `mangrove_extents` table
-- **Settings Management**: `pydantic-settings` — load `DATABASE_URL` and `GEMINI_API_KEY` from environment
+- **Settings Management**: `pydantic-settings` — load `DATABASE_URL` and `OPENROUTER_API_KEY` from environment
 - **AI Integration**: Google GenAI SDK (Gemini Flash 2.0) for the `/api/ask` endpoint
 - **Spatial Utilities**: `shapely` — geometry manipulation if needed server-side
 
@@ -99,7 +99,7 @@ backend/
 
 ## 🔒 Security & Configuration
 
-- **Never hardcode** `DATABASE_URL`, `GEMINI_API_KEY`, or `CORS_ORIGINS`
+- **Never hardcode** `DATABASE_URL`, `OPENROUTER_API_KEY`, or `CORS_ORIGINS`
 - Use `pydantic-settings` to load all config from environment
 - **CORS**: Configure `CORSMiddleware` from the start; use `CORS_ORIGINS` env var for Netlify URL
 
@@ -107,7 +107,7 @@ backend/
 
 - **Procfile**: `web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}`
 - All production dependencies (including `uvicorn`) must be in `requirements.txt`
-- **Heroku Config Vars** (NOT GitHub Secrets): `DATABASE_URL`, `GEMINI_API_KEY`, `CORS_ORIGINS`
+- **Heroku Config Vars** (NOT GitHub Secrets): `DATABASE_URL`, `OPENROUTER_API_KEY`, `CORS_ORIGINS`
 - Heroku auto-provides `DATABASE_URL` when Heroku Postgres add-on is attached
 
 

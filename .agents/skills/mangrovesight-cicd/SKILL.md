@@ -47,7 +47,7 @@ These are **runtime** environment variables for the FastAPI app:
 | Config Var | Example Value | Notes |
 |------------|--------------|-------|
 | `DATABASE_URL` | `postgresql://user:pass@host/db` | Auto-provided by Heroku Postgres add-on |
-| `GEMINI_API_KEY` | `AIza...` | Never in GitHub Secrets or source code |
+| `OPENROUTER_API_KEY` | `AIza...` | Never in GitHub Secrets or source code |
 | `CORS_ORIGINS` | `https://your-site.netlify.app` | Comma-separated allowed origins |
 
 ### Netlify Environment Variables (`Netlify Dashboard → Site settings → Environment variables`)
@@ -55,7 +55,7 @@ These are **runtime** environment variables for the FastAPI app:
 |----------|-------|-------|
 | `VITE_API_BASE_URL` | `https://your-app.herokuapp.com` | Used at build time by Vite |
 
-> ⚠️ **NEVER** put `GEMINI_API_KEY` or `DATABASE_URL` in GitHub Secrets — those should stay in Heroku Config Vars only. GitHub Secrets are only for deploy authentication tokens.
+> ⚠️ **NEVER** put `OPENROUTER_API_KEY` or `DATABASE_URL` in GitHub Secrets — those should stay in Heroku Config Vars only. GitHub Secrets are only for deploy authentication tokens.
 
 ## 📄 `heroku-deploy.yml` Template
 
@@ -153,7 +153,7 @@ Before first deploy:
 - [ ] Create Heroku app: `heroku create your-app-name`
 - [ ] Add Heroku Postgres: `heroku addons:create heroku-postgresql:essential-0`
 - [ ] Verify `DATABASE_URL` is set in Config Vars (added automatically)
-- [ ] Set `GEMINI_API_KEY`: `heroku config:set GEMINI_API_KEY=AIza...`
+- [ ] Set `OPENROUTER_API_KEY`: `heroku config:set OPENROUTER_API_KEY=AIza...`
 - [ ] Set `CORS_ORIGINS`: `heroku config:set CORS_ORIGINS=https://your-site.netlify.app`
 - [ ] Enable PostGIS in the database: `heroku pg:psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"`
 

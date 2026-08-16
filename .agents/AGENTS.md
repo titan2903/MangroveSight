@@ -16,7 +16,7 @@ These rules apply universally to all AI agents working on the **MangroveSight** 
 - **Database**: Backend berkomunikasi secara eksklusif dengan `PostgreSQL + PostGIS`. Jangan menggunakan NoSQL atau SQLite.
 
 ## 4. Keamanan & CI/CD
-- **Environment Variables**: Jangan pernah melakukan *hardcode* pada API Keys (seperti `GEMINI_API_KEY`), Token, atau URL Database di dalam *source code*. Selalu baca dari Environment Variable.
+- **Environment Variables**: Jangan pernah melakukan *hardcode* pada API Keys (seperti `OPENROUTER_API_KEY`), Token, atau URL Database di dalam *source code*. Selalu baca dari Environment Variable.
 - **Workflow Keselamatan**: Selalu pertimbangkan alur GitHub Actions (`heroku-deploy.yml` dan `netlify-deploy.yml`). Jangan membuat *breaking change* pada direktori `backend/` atau `frontend/` yang dapat merusak *build pipeline*.
 
 ## 5. Komunikasi & Kode
