@@ -13,8 +13,6 @@ const HeatmapLayer = ({ points }) => {
     if (!map || typeof L.heatLayer === "undefined") return;
 
     // Fix: Monkey patch L.HeatLayer._redraw and _update to check this._map
-    // This prevents "Cannot read properties of null (reading 'getSize')"
-    // when a requestAnimationFrame fires after the layer is removed.
     if (L.HeatLayer) {
       const originalRedraw = L.HeatLayer.prototype._redraw;
       if (originalRedraw && !L.HeatLayer.prototype._redraw_patched) {
@@ -26,12 +24,17 @@ const HeatmapLayer = ({ points }) => {
       }
     }
 
+    // Hitung radius awal berdasarkan zoom saat ini
+    const currentZoom = map.getZoom();
+    // Rumus sederhana: semakin besar zoom (mendekat), semakin besar radius pixelnya
+    const initialRadius = Math.max(15, currentZoom * 2.5);
+
     heatLayerRef.current = L.heatLayer([], {
-      radius: 25,
-      blur: 20,
+      radius: initialRadius,
+      blur: initialRadius * 0.8,
       maxZoom: 16,
       max: 1.0,
-      minOpacity: 0.3,
+      minOpacity: 0.35,
       gradient: {
         0.0: "#0d47a1", // Deep Blue
         0.3: "#0288d1", // Light Blue
@@ -44,11 +47,26 @@ const HeatmapLayer = ({ points }) => {
 
     heatLayerRef.current.addTo(map);
 
+    // Event listener untuk mengubah radius secara dinamis saat zoom berubah
+    const updateHeatmapRadius = () => {
+      if (!heatLayerRef.current) return;
+      const zoom = map.getZoom();
+      // Radius membesar saat di-zoom in agar titik tidak menyebar dan menghilang
+      const newRadius = Math.max(15, zoom * 3);
+      heatLayerRef.current.setOptions({
+        radius: newRadius,
+        blur: newRadius * 0.8,
+      });
+    };
+
+    map.on("zoomend", updateHeatmapRadius);
+
     return () => {
       if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
         heatLayerRef.current = null;
       }
+      map.off("zoomend", updateHeatmapRadius);
     };
   }, [map]);
 
@@ -61,15 +79,18 @@ const HeatmapLayer = ({ points }) => {
       return;
     }
 
-    // Backend returns [[lat, lng, intensity], ...] where intensity is the area.
-    // We normalize it between 0 and 1.
+    // Normalisasi bobot (intensity) menggunakan Logarithmic/Square Root.
+    // Jika hanya dibagi maxIntensity, area yang kecil akan memiliki bobot 0.001
+    // dan menghilang ketika tidak tumpang-tindih di zoom level tinggi.
     const intensities = points.map((p) => p[2] || 1);
     const maxIntensity = Math.max(...intensities, 1);
-    const normalizedPoints = points.map((p) => [
-      p[0],
-      p[1],
-      (p[2] || 1) / maxIntensity,
-    ]);
+
+    const normalizedPoints = points.map((p) => {
+      const val = p[2] || 1;
+      // Gunakan Math.sqrt agar titik kecil tetap mendapat bobot yang cukup (tidak terlalu pudar)
+      const weight = Math.sqrt(val) / Math.sqrt(maxIntensity);
+      return [p[0], p[1], weight];
+    });
 
     heatLayerRef.current.setLatLngs(normalizedPoints);
   }, [points]);
