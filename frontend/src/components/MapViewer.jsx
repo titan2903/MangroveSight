@@ -38,7 +38,7 @@ const MapViewer = ({
   onZoomChange,
 }) => {
   const [showYearBadge, setShowYearBadge] = useState(false);
-  const [clickedInfo, setClickedInfo] = useState(null);
+  const [_clickedInfo, setClickedInfo] = useState(null);
   const [parentMap, setParentMap] = useState(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const prevYear = useRef(null);
@@ -87,7 +87,7 @@ const MapViewer = ({
   const onEachFeature = useCallback(
     (feature, layer) => {
       const area = getAreaHa(feature);
-      const status = feature.properties?.status;
+      const _status = feature.properties?.status;
       const baseColor = feature.properties?.color || "#00BFA5";
       const statusLabel = feature.properties?.desc
         ? `Status: <b>${feature.properties.desc}</b><br/>`

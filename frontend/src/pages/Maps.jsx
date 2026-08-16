@@ -27,7 +27,7 @@ const Maps = () => {
   const [mapLoading, setMapLoading] = useState(false);
 
   // Disable simplification to avoid loading screens on zoom
-  const [simplifyGeoJSON, setSimplifyGeoJSON] = useState(false);
+  const [simplifyGeoJSON] = useState(false);
 
   // Initial Load: Fetch years and stats
   useEffect(() => {
@@ -90,7 +90,7 @@ const Maps = () => {
     loadData();
   }, [selectedYear, compareYear, compareMode, heatmapActive, simplifyGeoJSON]);
 
-  const handleZoomChange = useCallback((zoomLevel) => {
+  const handleZoomChange = useCallback((_zoomLevel) => {
     // Disabled: Dynamic zoom-based simplification causes annoying loading screens
     // when zooming in and out. Always use full resolution (or fixed simplify).
   }, []);

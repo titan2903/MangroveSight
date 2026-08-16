@@ -47,7 +47,7 @@ const ChatAssistant = () => {
         ...prev,
         { sender: "bot", text: response.answer },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -136,10 +136,10 @@ const ChatAssistant = () => {
                 <Typography variant="body2" component="div">
                   <ReactMarkdown
                     components={{
-                      p: ({ node, ...props }) => (
+                      p: ({ node: _node, ...props }) => (
                         <p style={{ margin: "0 0 8px 0" }} {...props} />
                       ),
-                      a: ({ node, ...props }) => (
+                      a: ({ node: _node, ...props }) => (
                         <a
                           style={{
                             color: msg.sender === "user" ? "#fff" : "#00BFA5",
@@ -147,7 +147,7 @@ const ChatAssistant = () => {
                           {...props}
                         />
                       ),
-                      ul: ({ node, ...props }) => (
+                      ul: ({ node: _node, ...props }) => (
                         <ul
                           style={{ margin: "0 0 8px 0", paddingLeft: "20px" }}
                           {...props}

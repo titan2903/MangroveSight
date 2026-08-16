@@ -97,6 +97,7 @@ export const MinimapSync = ({ parentMap }) => {
 };
 
 // ─── Helper: Feature area calculator ───────────────────────────────────────
+// eslint-disable-next-line react-refresh/only-export-components
 export const getAreaHa = (feature) => {
   try {
     if (feature.properties) {

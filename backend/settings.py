@@ -12,6 +12,7 @@ class Settings(BaseSettings):
         "https://mangrovesight.vercel.app",
     ]
     OPENROUTER_API_KEY: str = ""
+    OPENROUTER_MODEL: str = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 
     class Config:
         env_file = ".env"

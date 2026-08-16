@@ -46,7 +46,7 @@ Aturan Ketat:
 """
 
     response = client.chat.completions.create(
-        model="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        model=settings.OPENROUTER_MODEL,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": question},
