@@ -90,18 +90,31 @@ const MapViewer = ({
       const area = getAreaHa(feature);
       const _status = feature.properties?.status;
       const baseColor = feature.properties?.color || "#00BFA5";
+      
       const statusLabel = feature.properties?.desc
-        ? `Status: <b>${feature.properties.desc}</b><br/>`
+        ? `<div style="display:flex; align-items:center; margin-top:2px; font-size:0.8rem; color:#555;"><span style="display:inline-block; width:10px; height:10px; background-color:${baseColor}; border-radius:50%; margin-right:6px; border:1px solid #aaa;"></span>Status: <b style="margin-left:4px;">${feature.properties.desc}</b></div>`
         : "";
       
       const spesies = feature.properties?.species || "Rhizophora sp. (Dominan)";
       // Gunakan fungsi estimasi kecamatan dari MapHelpers
       const adminArea = getAdminArea(feature);
 
+      // Logika Tahun Dinamis berdasarkan Mode Perbandingan
+      let displayYear = year;
+      if (compareMode) {
+        if (_status === "loss") {
+          displayYear = year; // Hanya ada di tahun dasar
+        } else if (_status === "gain") {
+          displayYear = compareYear; // Hanya muncul di tahun pembanding
+        } else {
+          displayYear = `${year} & ${compareYear}`; // Ada di kedua tahun
+        }
+      }
+
       const tooltipHtml = `
       <div style="text-align:left; font-family:'Inter',sans-serif; min-width:160px; line-height:1.4;">
         <div style="color:#004D40; font-weight:700; font-size:0.95rem; margin-bottom:6px; text-align:center; border-bottom:1px solid #ddd; padding-bottom:4px;">🌿 Mangrove Patch</div>
-        <div style="font-size:0.8rem; color:#555;">📅 Tahun: <b>${compareMode ? `${year} vs ${compareYear}` : year}</b></div>
+        <div style="font-size:0.8rem; color:#555;">📅 Tahun: <b>${displayYear}</b></div>
         <div style="font-size:0.8rem; color:#555;">🧬 Spesies: <b>${spesies}</b></div>
         <div style="font-size:0.8rem; color:#555;">📍 Lokasi: <b>${adminArea}</b></div>
         ${statusLabel}
