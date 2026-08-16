@@ -96,6 +96,35 @@ export const MinimapSync = ({ parentMap }) => {
   return null;
 };
 
+// ─── Helper: Administrative Area Estimator ─────────────────────────────────
+// eslint-disable-next-line react-refresh/only-export-components
+export const getAdminArea = (feature) => {
+  if (feature.properties?.admin_area) return feature.properties.admin_area;
+
+  try {
+    // Ambil koordinat pertama dari polygon sebagai sampel lokasi
+    let coords = feature.geometry.coordinates[0];
+    if (feature.geometry.type === "MultiPolygon") {
+      coords = coords[0];
+    }
+    const lng = coords[0][0];
+    const lat = coords[0][1];
+
+    // Estimasi kasar pembagian wilayah Teluk Balikpapan berdasarkan koordinat
+    // Bujur > 116.78 umumnya berada di sisi Timur (Balikpapan)
+    if (lng > 116.78) {
+      if (lat > -1.17) return "Kec. Balikpapan Utara, Balikpapan";
+      return "Kec. Balikpapan Barat, Balikpapan";
+    } else {
+      // Sisi Barat (Penajam Paser Utara)
+      if (lat > -1.17) return "Kec. Sepaku, Penajam Paser Utara";
+      return "Kec. Penajam, Penajam Paser Utara";
+    }
+  } catch (e) {
+    return "Kawasan Teluk Balikpapan";
+  }
+};
+
 // ─── Helper: Feature area calculator ───────────────────────────────────────
 // eslint-disable-next-line react-refresh/only-export-components
 export const getAreaHa = (feature) => {

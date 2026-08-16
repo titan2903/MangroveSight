@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 
 def get_mangrove_geojson_from_db(year: int, db: Session, simplify: bool = False) -> Any:
-    # If simplify is True, we use ST_Simplify with 0.0005 degrees tolerance (~50 meters)
-    geometry_expr = "ST_Simplify(geometry, 0.0005)" if simplify else "geometry"
+    # If simplify is True, use ST_SimplifyPreserveTopology with ST_MakeValid to avoid TopologyException
+    geometry_expr = "ST_MakeValid(ST_SimplifyPreserveTopology(geometry, 0.0005))" if simplify else "ST_MakeValid(geometry)"
 
     query = text(f"""
         SELECT jsonb_build_object(
@@ -32,8 +32,9 @@ def get_mangrove_comparison(
     # Uses ST_Difference and ST_Intersection to find loss, gain, and stable areas
     # Returns a GeoJSON FeatureCollection
 
-    # Simplify geometry directly in CTEs to make ST_Difference and ST_Intersection much faster
-    geometry_expr = "ST_Simplify(geometry, 0.0005)" if simplify else "geometry"
+    # Wrap with ST_MakeValid to prevent TopologyException on complex polygons
+    # Use ST_SimplifyPreserveTopology instead of ST_Simplify to avoid self-intersections
+    geometry_expr = "ST_MakeValid(ST_SimplifyPreserveTopology(geometry, 0.0005))" if simplify else "ST_MakeValid(geometry)"
 
     query = text(f"""
         WITH y1 AS (

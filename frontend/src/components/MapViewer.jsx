@@ -24,6 +24,7 @@ import {
   CoordinateDisplay,
   MinimapSync,
   getAreaHa,
+  getAdminArea,
 } from "./MapHelpers";
 
 // ─── Main Component ──────────────────────────────────────────────────────
@@ -92,13 +93,19 @@ const MapViewer = ({
       const statusLabel = feature.properties?.desc
         ? `Status: <b>${feature.properties.desc}</b><br/>`
         : "";
+      
+      const spesies = feature.properties?.species || "Rhizophora sp. (Dominan)";
+      // Gunakan fungsi estimasi kecamatan dari MapHelpers
+      const adminArea = getAdminArea(feature);
 
       const tooltipHtml = `
-      <div style="text-align:center; font-family:'Inter',sans-serif; min-width:130px;">
-        <div style="color:#004D40; font-weight:700; font-size:0.9rem; margin-bottom:4px;">🌿 Mangrove Patch</div>
-        <div style="font-size:0.8rem; color:#555;">Tahun: <b>${compareMode ? `${year} vs ${compareYear}` : year}</b></div>
+      <div style="text-align:left; font-family:'Inter',sans-serif; min-width:160px; line-height:1.4;">
+        <div style="color:#004D40; font-weight:700; font-size:0.95rem; margin-bottom:6px; text-align:center; border-bottom:1px solid #ddd; padding-bottom:4px;">🌿 Mangrove Patch</div>
+        <div style="font-size:0.8rem; color:#555;">📅 Tahun: <b>${compareMode ? `${year} vs ${compareYear}` : year}</b></div>
+        <div style="font-size:0.8rem; color:#555;">🧬 Spesies: <b>${spesies}</b></div>
+        <div style="font-size:0.8rem; color:#555;">📍 Lokasi: <b>${adminArea}</b></div>
         ${statusLabel}
-        ${area !== "—" && !compareMode ? `<div style="font-size:0.8rem; color:#555;">Luas: <b>${Number(area).toFixed(2)} ha</b></div>` : ""}
+        ${area !== "—" && !compareMode ? `<div style="font-size:0.8rem; color:#555; margin-top:2px;">📏 Luas: <b>${Number(area).toFixed(2)} ha</b></div>` : ""}
       </div>
     `;
       layer.bindTooltip(tooltipHtml, {
