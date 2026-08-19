@@ -120,7 +120,7 @@ export const getAdminArea = (feature) => {
       if (lat > -1.17) return "Kec. Sepaku, Penajam Paser Utara";
       return "Kec. Penajam, Penajam Paser Utara";
     }
-  } catch (e) {
+  } catch {
     return "Kawasan Teluk Balikpapan";
   }
 };

@@ -90,11 +90,11 @@ const MapViewer = ({
       const area = getAreaHa(feature);
       const _status = feature.properties?.status;
       const baseColor = feature.properties?.color || "#00BFA5";
-      
+
       const statusLabel = feature.properties?.desc
         ? `<div style="display:flex; align-items:center; margin-top:2px; font-size:0.8rem; color:#555;"><span style="display:inline-block; width:10px; height:10px; background-color:${baseColor}; border-radius:50%; margin-right:6px; border:1px solid #aaa;"></span>Status: <b style="margin-left:4px;">${feature.properties.desc}</b></div>`
         : "";
-      
+
       const spesies = feature.properties?.species || "Rhizophora sp. (Dominan)";
       // Gunakan fungsi estimasi kecamatan dari MapHelpers
       const adminArea = getAdminArea(feature);

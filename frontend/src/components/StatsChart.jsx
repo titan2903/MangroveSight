@@ -1,8 +1,18 @@
-import { Box, Typography, Grid, Paper, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  Paper,
+  Divider,
+  IconButton,
+  Tooltip as MuiTooltip,
+} from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import DownloadIcon from "@mui/icons-material/Download";
+import html2canvas from "html2canvas";
 import {
   LineChart,
   Line,
@@ -15,6 +25,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Cell,
+  LabelList,
 } from "recharts";
 
 /* ─── Custom Tooltip for Line Chart ─── */
@@ -162,6 +173,26 @@ const SummaryCard = ({
 );
 
 /* ─── Main Component ─── */
+const handleDownloadChart = (elementId, filename) => {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  html2canvas(element, {
+    useCORS: true,
+    scale: 2, // better resolution
+    backgroundColor: "#ffffff",
+    ignoreElements: (node) =>
+      node.classList && node.classList.contains("no-capture"),
+  })
+    .then((canvas) => {
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    })
+    .catch((err) => console.error("Error capturing chart:", err));
+};
+
 const StatsChart = ({ stats }) => {
   if (!stats || !stats.epochs || stats.epochs.length === 0) {
     return <Typography>Data tidak tersedia.</Typography>;
@@ -260,6 +291,7 @@ const StatsChart = ({ stats }) => {
         {/* Line Chart */}
         <Grid size={{ xs: 12 }}>
           <Paper
+            id="line-chart-capture"
             elevation={0}
             sx={{
               p: 4,
@@ -269,16 +301,40 @@ const StatsChart = ({ stats }) => {
               boxShadow: "0 4px 20px rgba(0,77,64,0.06)",
             }}
           >
-            <Box sx={{ mb: 3 }}>
-              <Typography
-                variant="h6"
-                sx={{ color: "#004D40", fontWeight: 800 }}
-              >
-                Tren Luas Area Mangrove
-              </Typography>
-              <Typography variant="body2" sx={{ color: "#90a4ae", mt: 0.5 }}>
-                Total luas kawasan mangrove per tahun observasi (dalam hektar)
-              </Typography>
+            <Box
+              sx={{
+                mb: 3,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: "#004D40", fontWeight: 800 }}
+                >
+                  Tren Luas Area Mangrove
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#90a4ae", mt: 0.5 }}>
+                  Total luas kawasan mangrove per tahun observasi (dalam hektar)
+                </Typography>
+              </Box>
+              <MuiTooltip title="Unduh Gambar Chart">
+                <IconButton
+                  className="no-capture"
+                  onClick={() =>
+                    handleDownloadChart(
+                      "line-chart-capture",
+                      "Tren_Luas_Area_Mangrove.png",
+                    )
+                  }
+                  size="small"
+                  sx={{ color: "#004D40" }}
+                >
+                  <DownloadIcon />
+                </IconButton>
+              </MuiTooltip>
             </Box>
             <Box sx={{ width: "100%", height: 360 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -321,7 +377,20 @@ const StatsChart = ({ stats }) => {
                       stroke: "#fff",
                       strokeWidth: 2,
                     }}
-                  />
+                  >
+                    <LabelList
+                      dataKey="area"
+                      position="top"
+                      offset={10}
+                      formatter={(val) =>
+                        val.toLocaleString("id-ID", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      }
+                      style={{ fill: "#004D40", fontSize: 11, fontWeight: 700 }}
+                    />
+                  </Line>
                 </LineChart>
               </ResponsiveContainer>
             </Box>
@@ -331,6 +400,7 @@ const StatsChart = ({ stats }) => {
         {/* Bar Chart */}
         <Grid size={{ xs: 12 }}>
           <Paper
+            id="bar-chart-capture"
             elevation={0}
             sx={{
               p: 4,
@@ -350,7 +420,7 @@ const StatsChart = ({ stats }) => {
                 gap: 2,
               }}
             >
-              <Box>
+              <Box sx={{ flex: 1 }}>
                 <Typography
                   variant="h6"
                   sx={{ color: "#004D40", fontWeight: 800 }}
@@ -394,6 +464,21 @@ const StatsChart = ({ stats }) => {
                     Loss
                   </Typography>
                 </Box>
+                <MuiTooltip title="Unduh Gambar Chart">
+                  <IconButton
+                    className="no-capture"
+                    onClick={() =>
+                      handleDownloadChart(
+                        "bar-chart-capture",
+                        "Perubahan_Luas_Mangrove.png",
+                      )
+                    }
+                    size="small"
+                    sx={{ color: "#004D40", ml: 1 }}
+                  >
+                    <DownloadIcon />
+                  </IconButton>
+                </MuiTooltip>
               </Box>
             </Box>
             <Box sx={{ width: "100%", height: 360 }}>
@@ -428,6 +513,19 @@ const StatsChart = ({ stats }) => {
                   />
                   <ReferenceLine y={0} stroke="#b0bec5" strokeDasharray="4 4" />
                   <Bar dataKey="delta" radius={[4, 4, 0, 0]}>
+                    <LabelList
+                      dataKey="delta"
+                      position="top"
+                      offset={10}
+                      formatter={(val) =>
+                        (val > 0 ? "+" : "") +
+                        val.toLocaleString("id-ID", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      }
+                      style={{ fill: "#455a64", fontSize: 11, fontWeight: 700 }}
+                    />
                     {chartData.slice(1).map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
