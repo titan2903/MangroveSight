@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from routers import ai, mangrove, stats
 from settings import settings
@@ -35,6 +36,9 @@ serta asisten AI yang dapat menjawab pertanyaan seputar data tersebut.
     redoc_url="/redoc",
     openapi_tags=tags_metadata,
 )
+
+# GZip compression — reduces GeoJSON payload ~85-90% (1.3MB → ~150KB)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.add_middleware(
     CORSMiddleware,

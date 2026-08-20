@@ -8,6 +8,8 @@ def get_mangrove_geojson_from_db(year: int, db: Session, simplify: bool = False)
     # If simplify is True, use ST_SimplifyPreserveTopology with ST_MakeValid to avoid TopologyException
     geometry_expr = "ST_MakeValid(ST_SimplifyPreserveTopology(geometry, 0.0005))" if simplify else "ST_MakeValid(geometry)"
 
+    # Reduce coordinate precision to 5 decimal places (~1m accuracy, sufficient for web display)
+    # This cuts GeoJSON text size by ~30-40% by trimming unnecessary decimal digits
     query = text(f"""
         SELECT jsonb_build_object(
             'type',     'FeatureCollection',
@@ -16,7 +18,7 @@ def get_mangrove_geojson_from_db(year: int, db: Session, simplify: bool = False)
         FROM (
           SELECT jsonb_build_object(
             'type',       'Feature',
-            'geometry',   ST_AsGeoJSON({geometry_expr})::jsonb,
+            'geometry',   ST_AsGeoJSON({geometry_expr}, 5)::jsonb,
             'properties', jsonb_build_object('year', year)
           ) AS feature
           FROM mangrove_extents
@@ -49,17 +51,17 @@ def get_mangrove_comparison(
                 jsonb_build_object(
                     'type', 'Feature',
                     'properties', jsonb_build_object('status', 'loss', 'color', '#FF5252', 'desc', 'Hilang'),
-                    'geometry', ST_AsGeoJSON(ST_Difference(y1.geom, y2.geom))::jsonb
+                    'geometry', ST_AsGeoJSON(ST_Difference(y1.geom, y2.geom), 5)::jsonb
                 ),
                 jsonb_build_object(
                     'type', 'Feature',
                     'properties', jsonb_build_object('status', 'gain', 'color', '#00E5FF', 'desc', 'Bertambah'),
-                    'geometry', ST_AsGeoJSON(ST_Difference(y2.geom, y1.geom))::jsonb
+                    'geometry', ST_AsGeoJSON(ST_Difference(y2.geom, y1.geom), 5)::jsonb
                 ),
                 jsonb_build_object(
                     'type', 'Feature',
                     'properties', jsonb_build_object('status', 'stable', 'color', '#00BFA5', 'desc', 'Tetap'),
-                    'geometry', ST_AsGeoJSON(ST_Intersection(y1.geom, y2.geom))::jsonb
+                    'geometry', ST_AsGeoJSON(ST_Intersection(y1.geom, y2.geom), 5)::jsonb
                 )
             )
         )::text
@@ -72,7 +74,11 @@ def get_heatmap_points(year: int, db: Session) -> Any:
     # Returns an array of [lat, lng, intensity] for leafet.heat
     # Intensity is based on the area of the polygon patch
     query = text("""
-        SELECT COALESCE(jsonb_agg(jsonb_build_array(ST_Y(centroid), ST_X(centroid), area_ha)), '[]'::jsonb)::text
+        SELECT COALESCE(jsonb_agg(jsonb_build_array(
+            ROUND(ST_Y(centroid)::numeric, 5),
+            ROUND(ST_X(centroid)::numeric, 5),
+            ROUND(area_ha::numeric, 2)
+        )), '[]'::jsonb)::text
         FROM (
             SELECT ST_Centroid(geometry) as centroid, ST_Area(geometry::geography)/10000 as area_ha
             FROM mangrove_extents WHERE year = :year
