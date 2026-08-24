@@ -4,6 +4,10 @@
 
 MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari Final Project Bootcamp WebGIS Batch 3 MAPID Academy. Proyek ini bertujuan untuk memvisualisasikan perubahan sebaran hutan mangrove di wilayah Teluk Balikpapan dari periode 2007 hingga 2022 secara interaktif dan komprehensif.
 
+### Live Demo & Publikasi
+- 🌐 **Live WebGIS Application**: [https://mangrovesight.netlify.app](https://mangrovesight.netlify.app)
+- 📝 **Artikel Blog MAPID**: [MangroveSight: Solusi Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan Melalui WebGIS](https://mapid.co.id/blog/mangrovesight-solusi-pemantauan-perubahan-hutan-mangrove-teluk-balikpapan-melalui-webgis)
+
 ### Tujuan Proyek
 - Menyajikan data spasial mangrove dalam bentuk peta interaktif (berbasis GeoJSON/PostGIS).
 - Memungkinkan pengguna melihat perubahan luas mangrove antar tahun secara visual maupun statistik.
@@ -32,7 +36,7 @@ MangroveSight adalah proyek final WebGIS yang dikembangkan sebagai bagian dari F
 
 ### Deployment (CI/CD)
 1. Backend: Heroku Web Dyno (FastAPI) + Heroku Postgres (PostGIS).
-2. Frontend (Utama): Netlify (Akses: `mangrovesight.netlify.app`).
+2. Frontend (Utama): Netlify (Akses: [mangrovesight.netlify.app](https://mangrovesight.netlify.app)).
 3. Frontend (Backup): Vercel (Menggunakan `.github/workflows/vercel-deploy.yml` dan konfigurasi `vercel.json`).
 
 > **Catatan:** Untuk mengaktifkan deployment ke Vercel sebagai cadangan, pastikan Anda telah mengatur GitHub Secrets berikut: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, dan `VERCEL_PROJECT_ID`.
@@ -74,4 +78,5 @@ Aplikasi WebGIS siap diakses melalui browser pada: `http://localhost:5173/`.
 ### Referensi
 - Dokumen Pedoman Produk (PRD): `PRD.md`
 - Desain Arsitektur: `ARCHITECTURE.md`
+- Artikel Publikasi MAPID Blog: [MangroveSight: Solusi Pemantauan Perubahan Hutan Mangrove Teluk Balikpapan Melalui WebGIS](https://mapid.co.id/blog/mangrovesight-solusi-pemantauan-perubahan-hutan-mangrove-teluk-balikpapan-melalui-webgis)
 - Proyek ini ditujukan untuk *Final Project* dengan fokus spasial **Teluk Balikpapan, Kalimantan Timur**.
