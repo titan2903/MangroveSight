@@ -187,6 +187,7 @@ const MapViewer = ({
         zoomAnimation={true}
         fadeAnimation={true}
         markerZoomAnimation={true}
+        preferCanvas={true}
         ref={setParentMap}
       >
         <CoordinateDisplay />
