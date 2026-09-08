@@ -14,9 +14,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Keep maplibre worker in assets folder with consistent naming
-        manualChunks: {
-          'maplibre': ['maplibre-gl'],
+        // manualChunks must be a Function in Vite 8 (Rolldown)
+        manualChunks(id) {
+          if (id.includes("maplibre-gl")) {
+            return "maplibre";
+          }
         },
       },
     },
