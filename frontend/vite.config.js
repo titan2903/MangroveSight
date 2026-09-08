@@ -11,4 +11,14 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["maplibre-gl"],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Keep maplibre worker in assets folder with consistent naming
+        manualChunks: {
+          'maplibre': ['maplibre-gl'],
+        },
+      },
+    },
+  },
 });
