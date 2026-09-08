@@ -18,6 +18,26 @@ import { IconButton } from "@mui/material";
 
 const { BaseLayer } = LayersControl;
 
+import { createLayerComponent } from '@react-leaflet/core';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import '@maplibre/maplibre-gl-leaflet';
+
+const createMapLibreLayer = (props, context) => {
+  const instance = L.maplibreGL({
+    style: props.url,
+    attribution: props.attribution || '&copy; MAPID',
+  });
+  return { instance, context };
+};
+const updateMapLibreLayer = (instance, props, prevProps) => {
+  if (props.url !== prevProps.url) {
+    if (instance.getMaplibreMap && instance.getMaplibreMap()) {
+      instance.getMaplibreMap().setStyle(props.url);
+    }
+  }
+};
+const MapLibreLayer = createLayerComponent(createMapLibreLayer, updateMapLibreLayer);
+
 import {
   FitBounds,
   ZoomListener,
@@ -196,19 +216,25 @@ const MapViewer = ({
         <ScaleControl position="bottomright" imperial={false} />
 
         <LayersControl position="topleft">
-          <BaseLayer checked name="🗺️ Light Map">
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-              attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, Garmin, NGA, USGS'
+          <BaseLayer checked name="🗺️ Street 2D (MAPID)">
+            <MapLibreLayer
+              url={`https://basemap.mapid.io/styles/street-2d-building/style.json?key=${import.meta.env.VITE_MAPID_API_KEY}`}
+              attribution='&copy; <a href="https://mapid.io">MAPID</a>'
             />
           </BaseLayer>
-          <BaseLayer name="🛰️ Satellite (Esri)">
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+          <BaseLayer name="🗺️ Basic (MAPID)">
+            <MapLibreLayer
+              url={`https://basemap.mapid.io/styles/basic/style.json?key=${import.meta.env.VITE_MAPID_API_KEY}`}
+              attribution='&copy; <a href="https://mapid.io">MAPID</a>'
             />
           </BaseLayer>
-          <BaseLayer name="🌙 Dark Mode">
+          <BaseLayer name="🛰️ Satellite (MAPID)">
+            <MapLibreLayer
+              url={`https://basemap.mapid.io/styles/satellite/style.json?key=${import.meta.env.VITE_MAPID_API_KEY}`}
+              attribution='&copy; <a href="https://mapid.io">MAPID</a>'
+            />
+          </BaseLayer>
+          <BaseLayer name="🌙 Dark Mode (Esri)">
             <TileLayer
               url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
               attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, Garmin, NGA, USGS'

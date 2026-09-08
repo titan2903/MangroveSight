@@ -8,4 +8,7 @@ export default defineConfig({
     // Expose 'global' to fix issues with legacy plugins expecting it
     global: "globalThis",
   },
+  optimizeDeps: {
+    exclude: ["maplibre-gl"],
+  },
 });
