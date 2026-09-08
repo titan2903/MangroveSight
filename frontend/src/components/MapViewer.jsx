@@ -21,7 +21,7 @@ const { BaseLayer } = LayersControl;
 
 import { createLayerComponent } from '@react-leaflet/core';
 import { setWorkerUrl } from 'maplibre-gl';
-import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '@maplibre/maplibre-gl-leaflet';
 
