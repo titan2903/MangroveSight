@@ -9,7 +9,8 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Box, Typography, Chip, Fade, Tooltip } from "@mui/material";
-import * as L from "leaflet";
+import L from "leaflet";
+window.L = L; // Fix for @maplibre/maplibre-gl-leaflet in production
 import ForestIcon from "@mui/icons-material/Forest";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import HeatmapLayer from "./HeatmapLayer";

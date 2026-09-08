@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
 import { Box, Typography } from "@mui/material";
-import * as L from "leaflet";
+import L from "leaflet";
 
 // ─── Helper: Animated Fly to Bounds ───────────────────────────────────────
 export const FitBounds = ({ data }) => {
